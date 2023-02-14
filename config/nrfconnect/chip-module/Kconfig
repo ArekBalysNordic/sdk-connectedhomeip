@@ -181,3 +181,17 @@ config CHIP_LOG_SIZE_OPTIMIZATION
 	  providing detailed information that are not used in most cases.
 	  You can find full configuration enabled by this option
 	  in the platform/nrfconnect/CHIPPlatformConfig.h file.
+
+config CHIP_ADDRESS_RESOLVE_MIN_LOOKUP_DEFAULT_TIME_MS
+	int "Set the minimum lookup time to wait for DNSSD queries"
+	default 100
+	help
+	  Minimum lookup time to wait for additional DNSSD queries even if a replay
+	  as already been received or to allow additional heuristics regarding node choice
+	  to succeed.
+
+config CHIP_ADDRESS_RESOLVE_MAX_LOOKUP_DEFAULT_TIME_MS
+	int "Set the maximum lookup time to wait for DNSSD queries"
+	default 45000
+	help
+	  The maximum time to wait until a timeout on DNSSD response occurs

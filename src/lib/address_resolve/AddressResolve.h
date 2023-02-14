@@ -19,6 +19,7 @@
 #include <lib/core/PeerId.h>
 #include <lib/support/IntrusiveList.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
@@ -75,7 +76,7 @@ public:
     // While active, resolve handles are maintained in an internal list
     // to be processed, so copying their values (i.e. pointers) is not
     // allowed.
-    NodeLookupHandleBase(const NodeLookupHandleBase &) = delete;
+    NodeLookupHandleBase(const NodeLookupHandleBase &)             = delete;
     NodeLookupHandleBase & operator=(const NodeLookupHandleBase &) = delete;
 
     void SetListener(NodeListener * listener) { mListener = listener; }
@@ -97,7 +98,7 @@ public:
     NodeLookupRequest() {}
     NodeLookupRequest(const PeerId & peerId) : mPeerId(peerId) {}
 
-    NodeLookupRequest(const NodeLookupRequest &) = default;
+    NodeLookupRequest(const NodeLookupRequest &)             = default;
     NodeLookupRequest & operator=(const NodeLookupRequest &) = default;
 
     const PeerId & GetPeerId() const { return mPeerId; }
@@ -141,8 +142,8 @@ public:
     }
 
 private:
-    static constexpr uint32_t kMinLookupTimeMsDefault = 200;
-    static constexpr uint32_t kMaxLookupTimeMsDefault = 45000;
+    static constexpr uint32_t kMinLookupTimeMsDefault = CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_DEFAULT_TIME_MS;
+    static constexpr uint32_t kMaxLookupTimeMsDefault = CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_DEFAULT_TIME_MS;
 
     PeerId mPeerId;
     System::Clock::Milliseconds32 mMinLookupTimeMs{ kMinLookupTimeMsDefault };

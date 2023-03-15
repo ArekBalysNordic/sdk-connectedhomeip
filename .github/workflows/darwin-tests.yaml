@@ -15,9 +15,7 @@
 name: Darwin Tests
 
 on:
-    push:
-    pull_request:
-    workflow_dispatch:
+  workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==

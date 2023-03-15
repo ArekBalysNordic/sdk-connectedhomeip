@@ -15,8 +15,6 @@
 name: Tests
 
 on:
-    push:
-    pull_request:
     workflow_dispatch:
 
 concurrency:
@@ -514,7 +512,7 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
 
-        if: github.actor != 'restyled-io[bot]' && false
+        if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
 
         steps:

@@ -449,6 +449,13 @@ config BOOT_IMAGE_ACCESS_HOOKS
 config UPDATEABLE_IMAGE_NUMBER
     default 2
 
+# Change the main thread priority to 1 to avoid setting the same thread 
+# priority value as for IPC0 (which default value is set to 0). 
+# If the priorities are equal long operations on the main thread can
+# block IPC communication to the network core and cause application crash.
+config MAIN_THREAD_PRIORITY
+    default 1
+
 # Generate random numbers using Xoroshiro algorithm instead of direct calls
 # to the cryptocell library to workaround firmware hangs.
 choice RNG_GENERATOR_CHOICE

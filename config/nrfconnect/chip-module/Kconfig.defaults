@@ -100,16 +100,16 @@ config NET_IF_MCAST_IPV6_ADDR_COUNT
 
 # Network buffers
 config NET_PKT_RX_COUNT
-    default 16
+    default 8
 
 config NET_PKT_TX_COUNT
-    default 16
+    default 8
 
 config NET_BUF_RX_COUNT
-    default 80
+    default 16
 
 config NET_BUF_TX_COUNT
-    default 80
+    default 16
 
 # Bluetooth Low Energy configs
 

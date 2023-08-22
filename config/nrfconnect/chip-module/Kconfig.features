@@ -73,6 +73,21 @@ config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
 
 endif # CHIP_SPI_NOR
 
+config CHIP_MEMORY_PROFILING
+	bool "Enable features for tracking memory usage"
+	default n
+	select CHIP_STATISTICS
+	select CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT
+	select MBEDTLS_MEMORY_DEBUG if !CHIP_CRYPTO_PSA
+	select SYS_HEAP_RUNTIME_STATS
+	select KERNEL_SHELL
+	select NET_STATISTICS
+	select NET_SHELL
+	select NET_BUF_POOL_USAGE
+	select OPENTHREAD_SHELL if !CHIP_WIFI
+	help
+	  Enables features for tracking memory usage in Matter.
+
 config CHIP_NUS
 	bool "Enable Nordic UART service for Matter purposes"
 	select BT_NUS

@@ -288,7 +288,7 @@ config SHELL_STACK_SIZE
     default 2616
 
 config HEAP_MEM_POOL_SIZE
-    default 200000
+    default 153600
 
 endif
 

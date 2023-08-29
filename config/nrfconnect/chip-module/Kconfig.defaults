@@ -257,6 +257,21 @@ config WPA_SUPP_NO_DEBUG
 config NRF_WIFI_LOW_POWER
     default n
 
+config NRF700X_RX_NUM_BUFS
+    default 16
+
+config NRF700X_TX_MAX_DATA_SIZE
+    default 1280
+
+config NRF700X_RX_MAX_DATA_SIZE
+    default 1280
+
+config NRF700X_MAX_TX_TOKENS
+    default 8
+
+config NRF700X_MAX_TX_AGGREGATION
+    default 1
+
 config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
     default n
 
@@ -288,7 +303,7 @@ config SHELL_STACK_SIZE
     default 2616
 
 config HEAP_MEM_POOL_SIZE
-    default 153600
+    default 80000
 
 endif
 

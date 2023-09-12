@@ -87,7 +87,7 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
-    default 8192
+    default 6144
 
 config INIT_STACKS
     default y
@@ -239,8 +239,7 @@ config IEEE802154_NRF5_RX_STACK_SIZE
     default 1024
 
 config OPENTHREAD_THREAD_STACK_SIZE
-	default 4096 if !CHIP_OPENTHREAD_JOINER_ENABLED
-	default 6240
+	default 4096
 
 endif
 
@@ -309,7 +308,7 @@ endif
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
     default 28672 if CHIP_WIFI
-    default 10240 if NET_L2_OPENTHREAD
+    default 8192 if NET_L2_OPENTHREAD
 
 # Enable mbedTLS from nrf_security library
 
@@ -327,8 +326,7 @@ config MBEDTLS_ENABLE_HEAP
     default y
 
 config MBEDTLS_HEAP_SIZE
-    default 8192 if (NET_L2_OPENTHREAD && !CHIP_OPENTHREAD_JOINER_ENABLED)
-    default 15360
+    default 8192
 
 config MBEDTLS_TLS_LIBRARY
     default y

@@ -281,6 +281,10 @@ config NRF700X_MAX_TX_AGGREGATION
 config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
     default n
 
+# it saves 25kB of FLASH
+config WPA_SUPP_ADVANCED_FEATURES
+    default n
+
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 2560
 
@@ -311,7 +315,7 @@ config SHELL_STACK_SIZE
 config HEAP_MEM_POOL_SIZE
     default 80000
 
-endif
+endif # CHIP_WIFI
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
     default 28672 if CHIP_WIFI

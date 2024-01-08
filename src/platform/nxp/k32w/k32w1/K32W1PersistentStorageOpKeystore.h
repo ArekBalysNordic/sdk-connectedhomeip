@@ -142,6 +142,14 @@ public:
                                  Crypto::P256ECDSASignature & outSignature) const override;
     Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override;
     void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override;
+    CHIP_ERROR ExportOpKeypairForFabric(FabricIndex fabricIndex, Crypto::P256SerializedKeypair & outKeypair) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR MigrateOpKeypairForFabric(chip::FabricIndex, chip::Crypto::OperationalKeystore &) const override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
 protected:
     void ResetPendingKey()

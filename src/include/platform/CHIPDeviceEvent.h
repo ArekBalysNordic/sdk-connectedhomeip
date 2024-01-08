@@ -239,6 +239,12 @@ enum PublicEventTypes
      * sending messages to other nodes.
      */
     kServerReady,
+
+    /**
+     * Signals that an operational key migration from one Operational Keystore to another has failed.
+     *
+     */
+    kOperationalKeystoreMigrationFailed,
 };
 
 /**
@@ -526,6 +532,11 @@ struct ChipDeviceEvent final
         {
             OtaState newState;
         } OtaStateChanged;
+
+        struct
+        {
+            FabricIndex fabricIndex;
+        } OperationalKeystoreMigrationFailed;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

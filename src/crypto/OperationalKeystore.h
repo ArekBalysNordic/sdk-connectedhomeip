@@ -152,6 +152,7 @@ public:
      * @retval CHIP_ERROR_NOT_IMPLEMENTED if the exporting is not implemented for the cryptography backend.
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if there is no keypair found for `fabricIndex`.
      * @retval CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if there is no keypair found for `fabricIndex`.
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `keyPair` buffer is too small to store the read out keypair.
      * @retval other CHIP_ERROR value on internal storage or crypto engine errors.
      */
     virtual CHIP_ERROR MigrateOpKeypairForFabric(FabricIndex fabricIndex, OperationalKeystore & operationalKeystore) const

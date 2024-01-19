@@ -54,6 +54,7 @@ bool PSAOperationalKeystore::PersistentP256Keypair::Exists() const
 
 CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
 {
+    ChipLogError(Crypto, "\n PersistentP256Keypair::Generate");
     CHIP_ERROR error                = CHIP_NO_ERROR;
     psa_status_t status             = PSA_SUCCESS;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
@@ -86,6 +87,7 @@ exit:
 CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Destroy()
 {
     psa_status_t status = psa_destroy_key(GetKeyId());
+    ChipLogError(Crypto, "\n PersistentP256Keypair::Destroy");
 
     ReturnErrorCodeIf(status == PSA_ERROR_INVALID_HANDLE, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
@@ -101,6 +103,7 @@ bool PSAOperationalKeystore::HasPendingOpKeypair() const
 bool PSAOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) const
 {
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), false);
+    ChipLogError(Crypto, "\n HasOpKeypairForFabric");
 
     if (mPendingFabricIndex == fabricIndex)
     {
@@ -113,6 +116,8 @@ bool PSAOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) cons
 CHIP_ERROR PSAOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest)
 {
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    ChipLogError(Crypto, "\n NewOpKeypairForFabric");
 
     if (HasPendingOpKeypair())
     {
@@ -140,6 +145,7 @@ CHIP_ERROR PSAOperationalKeystore::ActivateOpKeypairForFabric(FabricIndex fabric
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && mPendingFabricIndex == fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(mPendingKeypair->Pubkey().Matches(nocPublicKey), CHIP_ERROR_INVALID_PUBLIC_KEY);
     mIsPendingKeypairActive = true;
+    ChipLogError(Crypto, "\n ActivateOpKeypairForFabric");
 
     return CHIP_NO_ERROR;
 }
@@ -148,7 +154,7 @@ CHIP_ERROR PSAOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fabricIn
 {
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && mPendingFabricIndex == fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(mIsPendingKeypairActive, CHIP_ERROR_INCORRECT_STATE);
-
+    ChipLogError(Crypto, "\n CommitOpKeypairForFabric");
     ReleasePendingKeypair();
 
     return CHIP_NO_ERROR;
@@ -157,7 +163,7 @@ CHIP_ERROR PSAOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fabricIn
 CHIP_ERROR PSAOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIndex)
 {
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
-
+    ChipLogError(Crypto, "\n RemoveOpKeypairForFabric");
     if (mPendingFabricIndex == fabricIndex)
     {
         RevertPendingKeypair();
@@ -170,6 +176,7 @@ CHIP_ERROR PSAOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIn
 void PSAOperationalKeystore::RevertPendingKeypair()
 {
     VerifyOrReturn(HasPendingOpKeypair());
+    ChipLogError(Crypto, "\n RevertPendingKeypair");
     mPendingKeypair->Destroy();
     ReleasePendingKeypair();
 }
@@ -178,7 +185,7 @@ CHIP_ERROR PSAOperationalKeystore::SignWithOpKeypair(FabricIndex fabricIndex, co
                                                      Crypto::P256ECDSASignature & outSignature) const
 {
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
-
+    ChipLogError(Crypto, "\n SignWithOpKeypair");
     if (mPendingFabricIndex == fabricIndex)
     {
         VerifyOrReturnError(mIsPendingKeypairActive, CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -193,16 +200,19 @@ CHIP_ERROR PSAOperationalKeystore::SignWithOpKeypair(FabricIndex fabricIndex, co
 
 Crypto::P256Keypair * PSAOperationalKeystore::AllocateEphemeralKeypairForCASE()
 {
+    ChipLogError(Crypto, "\n AllocateEphemeralKeypairForCASE");
     return Platform::New<Crypto::P256Keypair>();
 }
 
 void PSAOperationalKeystore::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
+    ChipLogError(Crypto, "\n ReleaseEphemeralKeypair");
     Platform::Delete(keypair);
 }
 
 void PSAOperationalKeystore::ReleasePendingKeypair()
 {
+    ChipLogError(Crypto, "\n ReleasePendingKeypair");
     Platform::Delete(mPendingKeypair);
     mPendingKeypair         = nullptr;
     mPendingFabricIndex     = kUndefinedFabricIndex;

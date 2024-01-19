@@ -270,6 +270,8 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
     ReturnErrorCodeIf(!mFactoryData.dac_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
+    ChipLogError(Crypto, "\n SignWithDeviceAttestationKey");
+
     size_t outputLen = 0;
 
     psa_status_t err = psa_sign_message(mDACPrivKeyId, PSA_ALG_ECDSA(PSA_ALG_SHA_256), messageToSign.data(), messageToSign.size(),

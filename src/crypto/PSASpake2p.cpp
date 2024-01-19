@@ -28,6 +28,7 @@ namespace Crypto {
 
 CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_t context_len)
 {
+    ChipLogError(Crypto, "\n PSASpake2p_P256_SHA256_HKDF_HMAC::Init");
     Clear();
 
     VerifyOrReturnError(context_len <= sizeof(mContext), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -60,6 +61,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
                                                            const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
                                                            size_t Lin_len)
 {
+    ChipLogError(Crypto, "\n PSASpake2p_P256_SHA256_HKDF_HMAC::BeginVerifier");
     VerifyOrReturnError(w0in_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(Lin_len == kP256_Point_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -102,6 +104,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
 {
     VerifyOrReturnError(w0in_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(w1in_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogError(Crypto, "\n PSASpake2p_P256_SHA256_HKDF_HMAC::BeginProver");
 
     mRole               = PSA_PAKE_ROLE_CLIENT;
     psa_status_t status = psa_pake_set_role(&mOperation, PSA_PAKE_ROLE_CLIENT);
@@ -138,6 +141,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
 CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len)
 {
     VerifyOrReturnError(out_len != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogError(Crypto, "\n PSASpake2p_P256_SHA256_HKDF_HMAC::ComputeRoundOne");
 
     psa_status_t status;
 
@@ -156,7 +160,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::ComputeRoundOne(const uint8_t * pab
 CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len)
 {
     VerifyOrReturnError(out_len != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
+ChipLogError(Crypto, "\n PSASpake2p_P256_SHA256_HKDF_HMAC::ComputeRoundTwo");
     psa_status_t status;
 
     if (mRole == PSA_PAKE_ROLE_CLIENT)
@@ -175,7 +179,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
 {
     psa_status_t status = psa_pake_input(&mOperation, PSA_PAKE_STEP_CONFIRM, in, in_len);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
+ChipLogError(Crypto, "\n PSASpake2p_P256_SHA256_HKDF_HMAC::KeyConfirm");
     return CHIP_NO_ERROR;
 }
 
@@ -183,6 +187,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(uint8_t * out, size_t * out
 {
     VerifyOrReturnError(out != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_len != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogError(Crypto, "\n PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys");
 
     /*
      * TODO: either:

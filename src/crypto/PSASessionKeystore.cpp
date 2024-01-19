@@ -53,7 +53,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Aes128KeyByteArray & keyMaterial,
 {
     // Destroy the old key if already allocated
     psa_destroy_key(key.As<psa_key_id_t>());
-
+    ChipLogError(Crypto, "\n PSASessionKeystore::CreateKey");
     AesKeyAttributes attrs;
     psa_status_t status = psa_import_key(&attrs.Get(), keyMaterial, sizeof(Aes128KeyByteArray), &key.AsMutable<psa_key_id_t>());
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
@@ -64,6 +64,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Aes128KeyByteArray & keyMaterial,
 CHIP_ERROR PSASessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
                                          Aes128KeyHandle & key)
 {
+    ChipLogError(Crypto, "\n PSASessionKeystore::DeriveKey");
     PsaKdf kdf;
     ReturnErrorOnFailure(kdf.Init(PSA_ALG_HKDF(PSA_ALG_SHA_256), secret.Span(), salt, info));
 
@@ -76,6 +77,7 @@ CHIP_ERROR PSASessionKeystore::DeriveSessionKeys(const ByteSpan & secret, const 
                                                  Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                                  AttestationChallenge & attestationChallenge)
 {
+    ChipLogError(Crypto, "\n PSASessionKeystore::DeriveSessionKeys");
     PsaKdf kdf;
     ReturnErrorOnFailure(kdf.Init(PSA_ALG_HKDF(PSA_ALG_SHA_256), secret, salt, info));
 
@@ -98,6 +100,7 @@ exit:
 
 void PSASessionKeystore::DestroyKey(Aes128KeyHandle & key)
 {
+    ChipLogError(Crypto, "\n PSASessionKeystore::DestroyKey");
     auto & keyId = key.AsMutable<psa_key_id_t>();
 
     psa_destroy_key(keyId);

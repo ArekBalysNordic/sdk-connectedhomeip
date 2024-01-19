@@ -788,6 +788,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
 
         while (count++ < fabric.keyset_count)
         {
+            ChipLogError(Crypto, "\n Y2");
             if (CHIP_NO_ERROR != Load(storage))
             {
                 break;
@@ -1778,6 +1779,7 @@ CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet 
 
     // Fabric found, get the keyset
     KeySetData keyset;
+    ChipLogError(Crypto, "\n Y1");
     VerifyOrReturnError(keyset.Find(mStorage, fabric, kIdentityProtectionKeySetId), CHIP_ERROR_NOT_FOUND);
 
     // If the keyset ID doesn't match, we have a ... problem.
@@ -1796,6 +1798,7 @@ CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet 
             memcpy(&out_keyset.epoch_keys[key_idx].key[0], keyset.operational_keys[key_idx].encryption_key, EpochKey::kLengthBytes);
         }
     }
+    ChipLogError(Crypto, "\n Y3");
 
     return CHIP_NO_ERROR;
 }

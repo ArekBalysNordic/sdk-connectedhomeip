@@ -763,11 +763,13 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinat
         FabricId fabricId = fabricInfo.GetFabricId();
         NodeId nodeId     = fabricInfo.GetNodeId();
         Crypto::P256PublicKey rootPubKey;
+        ChipLogError(Crypto, "\n X1");
         ReturnErrorOnFailure(mFabricsTable->FetchRootPubkey(fabricInfo.GetFabricIndex(), rootPubKey));
         Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
-
+        ChipLogError(Crypto, "\n X2");
         // Get IPK operational group key set for current candidate fabric
         GroupDataProvider::KeySet ipkKeySet;
+        ChipLogError(Crypto, "\n X3");
         CHIP_ERROR err = mGroupDataProvider->GetIpkKeySet(fabricInfo.GetFabricIndex(), ipkKeySet);
         if ((err != CHIP_NO_ERROR) ||
             ((ipkKeySet.num_keys_used == 0) || (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax)))
@@ -779,6 +781,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinat
         for (size_t keyIdx = 0; keyIdx < ipkKeySet.num_keys_used; ++keyIdx)
         {
             uint8_t candidateDestinationId[kSHA256_Hash_Length];
+            ChipLogError(Crypto, "\n X4");
             MutableByteSpan candidateDestinationIdSpan(candidateDestinationId);
             ByteSpan candidateIpkSpan(ipkKeySet.epoch_keys[keyIdx].key);
 
@@ -786,6 +789,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinat
                                             candidateDestinationIdSpan);
             if ((err == CHIP_NO_ERROR) && (candidateDestinationIdSpan.data_equal(destinationId)))
             {
+                ChipLogError(Crypto, "\n X5");
                 // Found a match, stop working, cache IPK, update local fabric context
                 found = true;
                 MutableByteSpan ipkSpan(mIPK);

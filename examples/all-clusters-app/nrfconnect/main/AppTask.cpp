@@ -21,6 +21,9 @@
 #include "FabricTableDelegate.h"
 #include "LEDUtil.h"
 #include "binding-handler.h"
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include "MigrationManager.h"
+#endif
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -205,10 +208,20 @@ CHIP_ERROR AppTask::Init()
 
     static CommonCaseDeviceServerInitParams initParams;
     static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    static chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore;
+    initParams.operationalKeystore = &sPSAOperationalKeystore;
+#endif
+
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
+
+// Migrate available Operational Keys
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    ReturnErrorOnFailure(Migration::MoveOperationalKeysFromKvsToIts());
+#endif
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);

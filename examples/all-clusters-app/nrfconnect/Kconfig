@@ -35,6 +35,8 @@ endchoice
 
 endif # NET_L2_OPENTHREAD
 
+
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
+source "../../platform/nrfconnect/Kconfig"
 source "Kconfig.zephyr"

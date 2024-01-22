@@ -65,7 +65,8 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
-               ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
+               ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
+               ${NRFCONNECT_COMMON}/util/MigrationManager.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER

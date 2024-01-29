@@ -336,7 +336,8 @@ if CHIP_ENABLE_ICD_SUPPORT
 
 config CHIP_ICD_SLOW_POLL_INTERVAL
 	int "Intermittently Connected Device slow polling interval (ms)"
-	default 1000
+	default 1000 if !CHIP_ICD_LIT_SUPPORT
+	default 30000 if CHIP_ICD_LIT_SUPPORT
 	help
 	  Provides the Intermittently Connected Device slow polling interval in milliseconds while the
 	  device is in the idle mode. It determines the fastest frequency at which the device will be able
@@ -353,7 +354,8 @@ config CHIP_ICD_FAST_POLLING_INTERVAL
 
 config CHIP_ICD_IDLE_MODE_DURATION
 	int "Intermittently Connected Device idle mode duration (s)"
-	default 120
+	default 120 if !CHIP_ICD_LIT_SUPPORT
+	default 300 if CHIP_ICD_LIT_SUPPORT
 	help
 	  Provides the Intermittently Connected Device idle mode duration in seconds.
 	  It determines the maximum amount of time the device can stay in the idle mode, which means the
@@ -368,14 +370,34 @@ config CHIP_ICD_ACTIVE_MODE_DURATION
 
 config CHIP_ICD_ACTIVE_MODE_THRESHOLD
 	int "Intermittently Connected Device active mode threshold (ms)"
-	default 300
+	default 0 if !CHIP_ICD_LIT_SUPPORT
+	default 5000 if CHIP_ICD_LIT_SUPPORT
 	help
 	  Provides the Intermittently Connected Device active mode threshold in milliseconds.
 	  It determines the minimum amount of time the device shall stay in the active mode after the network activity.
 
+config CHIP_ICD_LIT_SUPPORT
+	bool "Intermittenly Connected Device Long Idle Time support"
+	imply CHIP_ICD_CHECK_IN_SUPPORT
+	imply CHIP_ICD_UAT_SUPPORT
+	help
+	  Enables the Intermittently Connected Device Long Idle Time support in Matter.
+	  It also implies the ICD Check-In and UAT features support that are mandatory for LIT device.
+
+config CHIP_ICD_CHECK_IN_SUPPORT
+	bool "Intermittenly Connected Device Check-In protocol support"
+	help
+	  Enables the Check-In protocol support in Matter.
+
+config CHIP_ICD_UAT_SUPPORT
+	bool "Intermittenly Connected Device User Active Mode Trigger support"
+	help
+	  Enables the User Active Mode Trigger (UAT) support in Matter.
+
 config CHIP_ICD_CLIENTS_PER_FABRIC
 	int "Intermittently Connected Device number of clients per fabric"
 	default 2
+	depends on CHIP_ICD_CHECK_IN_SUPPORT
 	help
 	  Provides the Intermittently Connected Device number of clients per fabric. It determines the maximum number
 	  of clients per fabric that can be registered to receive notification from a device if their subscription is lost.

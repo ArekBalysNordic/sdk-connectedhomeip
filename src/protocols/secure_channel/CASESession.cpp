@@ -569,7 +569,7 @@ void CASESession::AbortPendingEstablish(CHIP_ERROR err)
     NotifySessionEstablishmentError(err, state);
 }
 
-CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
+CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session)
 {
     switch (mState)
     {

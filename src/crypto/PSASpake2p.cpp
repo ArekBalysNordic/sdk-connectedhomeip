@@ -179,24 +179,23 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(uint8_t * out, size_t * out_len)
+CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key) const
 {
-    VerifyOrReturnError(out != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_len != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
     /*
      * TODO: either:
      * - use psa_pake_shared_secret() proposed in https://github.com/ARM-software/psa-api/issues/86
      * - refactor Matter's GetKeys API to take an abstract shared secret instead of raw secret bytes.
+     *
+     *
+     * The currently used PSA version does not provide API to get shared key yet, however it is present on the most recent version.
+     * After it will be integrated, the extracting raw data from oberon context could be replaced with the following code:
+     *
+     *  HkdfKeyAttributes attrs;
+     *  psa_status_t status = psa_pake_get_shared_key(&mOperation, attrs.Get(), &key);
      */
-    oberon_spake2p_operation_t & oberonCtx = mOperation.MBEDTLS_PRIVATE(ctx).oberon_pake_ctx.ctx.oberon_spake2p_ctx;
+    const oberon_spake2p_operation_t & oberonCtx = mOperation.MBEDTLS_PRIVATE(ctx).oberon_pake_ctx.ctx.oberon_spake2p_ctx;
 
-    VerifyOrReturnError((oberonCtx.hash_len / 2) <= *out_len, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    memcpy(out, oberonCtx.shared, oberonCtx.hash_len / 2);
-    *out_len = oberonCtx.hash_len / 2;
-
-    return CHIP_NO_ERROR;
+    return keystore.CreateKey(ByteSpan(oberonCtx.shared, oberonCtx.hash_len / 2), key);
 }
 
 } // namespace Crypto

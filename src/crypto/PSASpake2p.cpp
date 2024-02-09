@@ -168,6 +168,20 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
     status = psa_pake_output(&mOperation, PSA_PAKE_STEP_CONFIRM, out, *out_len, out_len);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
+    // Import shared secret key
+    oberon_spake2p_operation_t & oberonCtx = mOperation.MBEDTLS_PRIVATE(ctx).oberon_pake_ctx.ctx.oberon_spake2p_ctx;
+    psa_key_attributes_t attrs             = PSA_KEY_ATTRIBUTES_INIT;
+
+    psa_set_key_type(&attrs, PSA_KEY_TYPE_DERIVE);
+    psa_set_key_algorithm(&attrs, PSA_ALG_HKDF(PSA_ALG_SHA_256));
+    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_DERIVE);
+
+    status = psa_import_key(&attrs, oberonCtx.shared, oberonCtx.hash_len / 2, &mSharedKey);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    // Remove shared from secret
+    memset(oberonCtx.shared, 0, sizeof(oberonCtx.shared));
+
     return CHIP_NO_ERROR;
 }
 
@@ -181,21 +195,12 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
 
 CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key) const
 {
-    /*
-     * TODO: either:
-     * - use psa_pake_shared_secret() proposed in https://github.com/ARM-software/psa-api/issues/86
-     * - refactor Matter's GetKeys API to take an abstract shared secret instead of raw secret bytes.
-     *
-     *
-     * The currently used PSA version does not provide API to get shared key yet, however it is present on the most recent version.
-     * After it will be integrated, the extracting raw data from oberon context could be replaced with the following code:
-     *
-     *  HkdfKeyAttributes attrs;
-     *  psa_status_t status = psa_pake_get_shared_key(&mOperation, attrs.Get(), &key);
-     */
-    const oberon_spake2p_operation_t & oberonCtx = mOperation.MBEDTLS_PRIVATE(ctx).oberon_pake_ctx.ctx.oberon_spake2p_ctx;
+    VerifyOrReturnError(mSharedKey != PSA_KEY_ID_NULL, CHIP_ERROR_INCORRECT_STATE);
 
-    return keystore.CreateKey(ByteSpan(oberonCtx.shared, oberonCtx.hash_len / 2), key);
+    auto & keyId = key.AsMutable<psa_key_id_t>();
+    keyId        = mSharedKey;
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Crypto

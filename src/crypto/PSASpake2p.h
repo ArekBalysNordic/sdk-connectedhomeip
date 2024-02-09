@@ -157,6 +157,7 @@ public:
 private:
     psa_pake_operation_t mOperation = PSA_PAKE_OPERATION_INIT;
     psa_key_id_t mKey               = PSA_KEY_ID_NULL;
+    psa_key_id_t mSharedKey         = PSA_KEY_ID_NULL;
 
     psa_pake_role_t mRole;
     uint8_t mContext[kSHA256_Hash_Length];

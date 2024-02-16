@@ -242,7 +242,20 @@ config CHIP_EXTENDED_DISCOVERY
 config NVS_LOOKUP_CACHE_SIZE
     default 512
 
+config UPDATEABLE_IMAGE_NUMBER
+    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
+    default 2 if SOC_SERIES_NRF53X
+
+config DFU_MULTI_IMAGE_MAX_IMAGE_COUNT
+    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
+
+config NRF_WIFI_FW_PATCH_DFU
+    default y if NRF_WIFI_PATCHES_EXT_FLASH_STORE
+
 # Enable OpenThread
+# ==============================================================================
+# OpenThread configuration
+# ==============================================================================
 
 config NET_L2_OPENTHREAD
     default y if !WIFI_NRF700X

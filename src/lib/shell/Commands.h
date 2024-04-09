@@ -92,5 +92,7 @@ void RegisterNFCCommands();
  */
 void RegisterDnsCommands();
 
+void RegisterVariableCommands();
+
 } // namespace Shell
 } // namespace chip

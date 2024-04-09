@@ -29,6 +29,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/VariableStats.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ErrorCategory.h>
 #include <messaging/ExchangeMessageDispatch.h>
@@ -167,6 +168,8 @@ void ReliableMessageMgr::ExecuteActions()
                         "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
                         " Send Cnt %d",
                         messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
+
+        VariableStats::Increment("MatterMessageRetransmissionCounter");
 
         CalculateNextRetransTime(*entry);
         SendFromRetransTable(entry);

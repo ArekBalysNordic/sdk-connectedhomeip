@@ -80,5 +80,7 @@ source_set("commands") {
     public_deps += [ "${chip_root}/src/app/server" ]
   }
 
+  sources += [ "Variable.cpp" ]
+
   cflags = [ "-Wconversion" ]
 }

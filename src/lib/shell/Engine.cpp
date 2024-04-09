@@ -128,6 +128,7 @@ void Engine::RegisterDefaultCommands()
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     RegisterStatCommands();
 #endif
+    RegisterVariableCommands();
 }
 
 } // namespace Shell

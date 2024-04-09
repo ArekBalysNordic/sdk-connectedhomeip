@@ -25,10 +25,12 @@
 #include <cstdint>
 #include <functional>
 
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/KeyValueStoreManager.h>
 
 #include "IntrusiveList.h"
 
+// TODO parametrize it
 #define MAXIMUM_VARIABLE_NAME 10
 #define MAXIMUM_VARIABLE_COUNT 10
 
@@ -75,12 +77,12 @@ struct VariablesMap
             mElementsCount++;
             return true;
         }
-
         return false;
     }
 
     bool Get(const char * key, T & value)
     {
+
         if (!key || !validateKey(key))
         {
             return false;
@@ -128,6 +130,29 @@ struct VariablesMap
         return kNoSlotsFound;
     }
 
+    bool GetOccupiedKeysNames(char * names, size_t bufferSize)
+    {
+        size_t offset = 0;
+        for (auto & it : mMap)
+        {
+            if (it.value != kInvalidKey)
+            {
+                if (offset + GetKeyLen(it.key) + 1 <= bufferSize)
+                {
+                    memcpy(names + offset, it.key, GetKeyLen(it.key));
+                    offset += GetKeyLen(it.key);
+                    memcpy(names + offset, "\n", 1);
+                    offset += 1;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 private:
     bool validateKey(const char * key)
     {
@@ -148,6 +173,7 @@ struct VariableStats
 {
     static bool Set(const char * name, uint32_t newValue, bool persistent = false)
     {
+#if CHIP_DEVICE_VARIABLE_STATISTICS
         if (persistent)
         {
             uint32_t value = newValue;
@@ -158,10 +184,14 @@ struct VariableStats
         }
 
         return Instance().mVariableMap.Set(name, newValue);
+#else
+        return false;
+#endif
     }
 
     static bool Increment(const char * name, bool persistent = false)
     {
+#if CHIP_DEVICE_VARIABLE_STATISTICS
         uint32_t variable = {};
         Get(name, variable, persistent);
 
@@ -169,12 +199,13 @@ struct VariableStats
         {
             return true;
         }
-
+#endif
         return false;
     }
 
     static bool Decrement(const char * name, bool persistent = false)
     {
+#if CHIP_DEVICE_VARIABLE_STATISTICS
         uint32_t variable = {};
         Get(name, variable, persistent);
 
@@ -182,12 +213,13 @@ struct VariableStats
         {
             return true;
         }
-
+#endif
         return false;
     }
 
     static bool Get(const char * name, uint32_t & value, bool persistent = false)
     {
+#if CHIP_DEVICE_VARIABLE_STATISTICS
         if (persistent)
         {
             uint32_t persistentValue = 0;
@@ -200,6 +232,17 @@ struct VariableStats
             return false;
         }
         return Instance().mVariableMap.Get(name, value);
+#else
+        return false;
+#endif
+    }
+
+    static bool GetList(char * keyList, size_t bufferSize)
+    {
+#if CHIP_DEVICE_VARIABLE_STATISTICS
+        return Instance().mVariableMap.GetOccupiedKeysNames(keyList, bufferSize);
+#endif
+        return false;
     }
 
     static VariableStats & Instance()

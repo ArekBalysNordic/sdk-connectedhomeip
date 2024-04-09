@@ -35,33 +35,40 @@ namespace chip {
 template <typename T, size_t N>
 struct VariablesMap
 {
+    static constexpr T kInvalidKey{ std::numeric_limits<T>::max() };
     static constexpr size_t kNoSlotsFound{ N + 1 };
 
     struct Item
     {
-        char * key[MAXIMUM_VARIABLE_NAME];
-        size_t keySize = 0;
-        T value;
+        char key[MAXIMUM_VARIABLE_NAME + 1] = {};
+        T value                             = kInvalidKey;
     };
 
-    bool Set(const char * key, size_t keySize, T value)
+    bool Set(const char * key, T value)
     {
-        const auto & it = std::find_if(std::begin(mMap), std::end(mMap),
-                                       [key](const Item & item) { return memcmp(item.key, key, item.keySize) == 0; });
-
-        if (it != std::end(mMap))
+        if (!key || !validateKey(key))
         {
-            it->value = std::move(value);
-            return true;
+            return false;
         }
-        else if (mElementsCount < N)
+
+        for (auto & it : mMap)
+        {
+            if (memcmp(it.key, key, GetKeyLen(key)) == 0 && GetKeyLen(it.key) == GetKeyLen(key))
+            {
+                it.value = std::move(value);
+                return true;
+            }
+        }
+
+        if (mElementsCount < N)
         {
             size_t slot = GetFirstFreeSlot();
             if (slot == kNoSlotsFound)
             {
                 return false;
             }
-            memcpy(mMap[slot].key, key, keySize);
+
+            memcpy(mMap[slot].key, key, GetKeyLen(key));
             mMap[slot].value = std::move(value);
             mElementsCount++;
             return true;
@@ -70,26 +77,16 @@ struct VariablesMap
         return false;
     }
 
-    bool Erase(const char * key, size_t keySize)
+    bool Get(const char * key, T & value)
     {
-        const auto & it = std::find_if(std::begin(mMap), std::end(mMap),
-                                       [key](const Item & item) { return memcmp(item.key, key, item.keySize) == 0; });
-
-        if (it != std::end(mMap))
+        if (!key || !validateKey(key))
         {
-            it->value   = T{};
-            it->keySize = 0;
-            mElementsCount--;
-            return true;
+            return false;
         }
-        return false;
-    }
 
-    bool Get(const char * key, size_t keySize, T & value)
-    {
         for (auto & it : mMap)
         {
-            if (memcmp(it.key, key, it.keySize) == 0)
+            if (memcmp(it.key, key, GetKeyLen(key)) == 0 && GetKeyLen(it.key) == GetKeyLen(key))
             {
                 value = it.value;
                 return true;
@@ -98,11 +95,16 @@ struct VariablesMap
         return false;
     }
 
-    bool Contains(const char * key, size_t keySize)
+    bool Contains(const char * key)
     {
+        if (!key || !validateKey(key))
+        {
+            return false;
+        }
+
         for (auto & it : mMap)
         {
-            if (strcmp(key, it.key) == 0 && keySize == it.keySize)
+            if (memcmp(it.key, key, GetKeyLen(key)) == 0)
             {
                 return true;
             }
@@ -117,37 +119,64 @@ struct VariablesMap
         size_t foundIndex = 0;
         for (auto & it : mMap)
         {
-            if (it.keySize != 0)
+            if (it.value == kInvalidKey)
                 return foundIndex;
             foundIndex++;
         }
         return kNoSlotsFound;
     }
 
+private:
+    bool validateKey(const char * key)
+    {
+        if (GetKeyLen(key) == MAXIMUM_VARIABLE_NAME + 1 || GetKeyLen(key) == 0)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    size_t GetKeyLen(const char * key) { return strnlen(key, MAXIMUM_VARIABLE_NAME + 1); }
+
     Item mMap[N];
     uint16_t mElementsCount{ 0 };
 };
 
-template <typename ValueType>
 class VariableStats
 {
-private:
-    struct Dictionary
-    {
-        char * name[MAXIMUM_VARIABLE_NAME + 1];
-        size_t nameSize = 0;
-        ValueType value;
-    };
-
 public:
-    static bool Set(char * name, size_t nameSize, ValueType newValue, bool persistent = false)
+    static bool Set(const char * name, uint32_t newValue, bool persistent = false)
     {
-        return Instance().mVariableMap.Set(name, nameSize, newValue);
+        return Instance().mVariableMap.Set(name, newValue);
     }
 
-    static bool Increment(char * name) { return false; }
+    static bool Increment(const char * name)
+    {
+        uint32_t variable = {};
+        Get(name, variable);
 
-    static bool Get(char * name, size_t nameSize, ValueType & value) { return Instance().mVariableMap.Get(name, nameSize, value); }
+        if (Set(name, ++variable))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    static bool Decrement(const char * name)
+    {
+        uint32_t variable = {};
+        Get(name, variable);
+
+        if (Set(name, --variable))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    static bool Get(const char * name, uint32_t & value) { return Instance().mVariableMap.Get(name, value); }
 
     static VariableStats & Instance()
     {
@@ -158,7 +187,7 @@ public:
 private:
     VariableStats() {}
 
-    VariablesMap<ValueType, 10> mVariableMap;
+    VariablesMap<uint32_t, 10> mVariableMap;
 };
 
 } // namespace chip

@@ -20,6 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/VariableStats.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <transport/SessionManager.h>
 
@@ -179,6 +180,8 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
 
+    VariableStats::Increment("CASE_failed");
+
     PrepareForSessionEstablishment();
 }
 
@@ -186,6 +189,9 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
+
+    VariableStats::Increment("CASE_success");
+
     PrepareForSessionEstablishment(session->GetPeer());
 }
 

@@ -34,7 +34,9 @@ CHIP_ERROR BLEHelpHandler()
 {
     streamer_t * sout = streamer_get();
 
-    streamer_printf(sout, "please provide variable name: matter variable [variable name]\r\n");
+    // TODO Move it to subcommands' help
+    streamer_printf(sout, "use -l to list all possible variables, use -p to read a value from persistent storage");
+    streamer_printf(sout, "Possible options:\r\n matter variable [name]\r\n matter variable -l\r\n matter variable -p [name]");
 
     return CHIP_NO_ERROR;
 }
@@ -48,31 +50,44 @@ CHIP_ERROR VariableDispatch(int argc, char ** argv)
     }
 
     streamer_t * sout = streamer_get();
+    uint32_t value    = 0;
+    bool persistent   = false;
 
-    if (argc == 1)
+    // TODO Make subcommand for -l and -p
+    if (strcmp(argv[0], "-l") == 0 && strlen(argv[0]) == strlen("-l"))
     {
-        if (strcmp(argv[0], "list") == 0)
-        {
-            // TODO parametrize size of the following table
-            char availableVariables[(10 + 1) * 10 + 1] = {};
+        // TODO parametrize size of the following table
+        char availableVariables[(10 + 1) * 10 + 1] = {};
 
-            chip::VariableStats::GetList(availableVariables, sizeof(availableVariables));
-            streamer_printf(sout, "%s", availableVariables);
-            return CHIP_NO_ERROR;
-        }
+        chip::VariableStats::GetList(availableVariables, sizeof(availableVariables));
+        // TODO ensure that there is null termination
+        streamer_printf(sout, "%s", availableVariables);
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "-lp") == 0 && strlen(argv[0]) == strlen("-lp"))
+    {
+        // TODO parametrize size of the following table
+        char availableVariables[(10 + 1) * 10 + 1] = {};
 
-        uint32_t value = 0;
-        if (chip::VariableStats::Get(argv[0], value))
-        {
-            streamer_printf(sout, "%u\r\n", value);
-        }
-        else
-        {
-            streamer_printf(sout, "No variable registered under this record\r\n");
-        }
+        // TODO Persistent storage list is not available yet
+        // chip::VariableStats::GetList(availableVariables, sizeof(availableVariables));
+        // TODO ensure that there is null termination
+        // streamer_printf(sout, "%s", availableVariables);
+        return CHIP_NO_ERROR;
+    }
+    else if (strcmp(argv[0], "-p") && strlen(argv[0]) == strlen("-p"))
+    {
+        persistent = true;
     }
 
-    // TODO add support for persistent variables (depending on arguments...)
+    if (chip::VariableStats::Get(argv[0], value, persistent))
+    {
+        streamer_printf(sout, "%u\r\n", value);
+    }
+    else
+    {
+        streamer_printf(sout, "No variable registered under this record\r\n");
+    }
 
     return CHIP_NO_ERROR;
 }

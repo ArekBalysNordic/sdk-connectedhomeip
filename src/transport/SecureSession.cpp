@@ -15,6 +15,7 @@
  */
 
 #include <access/AuthMode.h>
+#include <lib/support/VariableStats.h>
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionTable.h>
 
@@ -55,6 +56,8 @@ void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId 
         mTable.NewerSessionAvailable(this);
 
     ChipLogDetail(Inet, "SecureSession[%p]: Activated - Type:%d LSID:%d", this, to_underlying(mSecureSessionType), mLocalSessionId);
+
+    VariableStats::Increment("CASE_activated");
 }
 
 const char * SecureSession::StateToString(State state) const

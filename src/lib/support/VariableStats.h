@@ -30,8 +30,10 @@
 
 #include "IntrusiveList.h"
 
+// TODO add better error handling than std::bool
+
 // TODO parametrize it
-#define MAXIMUM_VARIABLE_NAME 10
+#define MAXIMUM_VARIABLE_NAME 20
 #define MAXIMUM_VARIABLE_COUNT 10
 
 namespace chip {
@@ -44,6 +46,7 @@ struct VariablesMap
 
     struct Item
     {
+        // TODO consider changing a problematic char key names to some IDs
         char key[MAXIMUM_VARIABLE_NAME + 1] = {};
         T value                             = kInvalidKey;
     };
@@ -156,23 +159,25 @@ struct VariablesMap
 private:
     bool validateKey(const char * key)
     {
-        if (GetKeyLen(key) == MAXIMUM_VARIABLE_NAME + 1 || GetKeyLen(key) == 0)
+        if (GetKeyLen(key) >= MAXIMUM_VARIABLE_NAME + 1 || GetKeyLen(key) == 0)
         {
             return false;
         }
         return true;
     }
 
-    size_t GetKeyLen(const char * key) { return strnlen(key, MAXIMUM_VARIABLE_NAME + 1); }
+    size_t GetKeyLen(const char * key) { return strlen(key); }
 
     Item mMap[N];
     uint16_t mElementsCount{ 0 };
 };
 
+// TODO Add possibility to use various types instead of uint32_t
 struct VariableStats
 {
     static bool Set(const char * name, uint32_t newValue, bool persistent = false)
     {
+        // TODO add protection against storing too many keys, compare it with size of map
 #if CHIP_DEVICE_VARIABLE_STATISTICS
         if (persistent)
         {
@@ -237,9 +242,14 @@ struct VariableStats
 #endif
     }
 
-    static bool GetList(char * keyList, size_t bufferSize)
+    static bool GetList(char * keyList, size_t bufferSize, bool persistent = false)
     {
 #if CHIP_DEVICE_VARIABLE_STATISTICS
+        if (persistent)
+        {
+            // TODO add support for persistent variables list
+            return false;
+        }
         return Instance().mVariableMap.GetOccupiedKeysNames(keyList, bufferSize);
 #endif
         return false;
@@ -252,6 +262,7 @@ struct VariableStats
     }
 
 private:
+    // TODO parametrize size of the variable map
     VariablesMap<uint32_t, 10> mVariableMap;
 };
 

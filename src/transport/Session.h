@@ -24,6 +24,7 @@
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/ReferenceCountedHandle.h>
+#include <lib/support/VariableStats.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/LockTracker.h>
 #include <transport/SessionDelegate.h>
@@ -247,6 +248,8 @@ protected:
         while (!mHolders.Empty())
         {
             mHolders.begin()->SessionReleased(); // SessionReleased must remove the item from the linked list
+
+            VariableStats::Increment("CASE_released");
         }
     }
 

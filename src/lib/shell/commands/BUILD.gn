@@ -80,5 +80,8 @@ source_set("commands") {
     public_deps += [ "${chip_root}/src/app/server" ]
   }
 
+  # TODO: This source should be under CHIP_DEVICE_VARIABLE_STATISTICS config converted to GN variable
+  sources += [ "Variable.cpp" ]
+
   cflags = [ "-Wconversion" ]
 }

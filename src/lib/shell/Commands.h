@@ -92,5 +92,11 @@ void RegisterNFCCommands();
  */
 void RegisterDnsCommands();
 
+/**
+ * This function registers the variable commands.
+ *
+ */
+void RegisterVariableCommands();
+
 } // namespace Shell
 } // namespace chip

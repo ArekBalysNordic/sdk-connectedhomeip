@@ -324,6 +324,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
                     packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(sessionHandle), fabricIndex,
                     ChipLogValueX64(destination), static_cast<uint16_t>(compressedFabricId), addressStr, typeStr, protocolName,
                     msgTypeName);
+    VariableStats::Increment("msg_TX");
 #endif
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));

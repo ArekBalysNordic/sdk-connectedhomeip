@@ -225,6 +225,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                     packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(session), session->GetFabricIndex(),
                     ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
                     payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
+
+    VariableStats::Increment("msg_RX");
 #endif
 
     MessageFlags msgFlags;

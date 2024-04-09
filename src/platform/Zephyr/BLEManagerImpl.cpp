@@ -30,6 +30,7 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/VariableStats.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
@@ -634,6 +635,8 @@ CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
     ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX characteristic (ConnId 0x%02x)",
                   bt_conn_index(c1WriteEvent->BtConn));
 
+    VariableStats::Increment("CHIPoBLE_RX");
+
     HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
                         PacketBufferHandle::Adopt(c1WriteEvent->Data));
     bt_conn_unref(c1WriteEvent->BtConn);
@@ -647,6 +650,8 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharComplete(const ChipDeviceEvent * event)
 
     ChipLogDetail(DeviceLayer, "Indication for CHIPoBLE TX characteristic done (ConnId 0x%02x, result 0x%02x)",
                   bt_conn_index(c2IndDoneEvent->BtConn), c2IndDoneEvent->Result);
+
+    VariableStats::Increment("CHIPoBLE_TX");
 
     // Signal the BLE Layer that the outstanding indication is complete.
     HandleIndicationConfirmation(c2IndDoneEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);

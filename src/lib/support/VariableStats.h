@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Contains a class handling registration of variable and keep their occurrences.
+ *          Contains a class handling registration of variable and keep their values.
  */
 #pragma once
 
@@ -28,13 +28,12 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/KeyValueStoreManager.h>
 
-#include "IntrusiveList.h"
-
 // TODO add better error handling than std::bool
+// TODO Add better documentation
 
-// TODO parametrize it
+// TODO parametrize it in config
 #define MAXIMUM_VARIABLE_NAME 20
-#define MAXIMUM_VARIABLE_COUNT 10
+#define MAXIMUM_VARIABLE_COUNT 20
 
 namespace chip {
 
@@ -46,7 +45,7 @@ struct VariablesMap
 
     struct Item
     {
-        // TODO consider changing a problematic char key names to some IDs
+        // TODO consider changing a problematic char key names to some IDs (mostly to reduce size)
         char key[MAXIMUM_VARIABLE_NAME + 1] = {};
         T value                             = kInvalidKey;
     };
@@ -173,8 +172,30 @@ private:
 };
 
 // TODO Add possibility to use various types instead of uint32_t
+/**
+ * @brief A struct to collect variables provided as string and manipulate their values.
+ * This struct is based on simple map(string, value) and implements methods to increment and decrement values.
+ *
+ * The struct can be used to store various statistics data in the Matter Core.
+ * To enable full support of this struct set the CHIP_DEVICE_VARIABLE_STATISTICS config to 1.
+ * If the config is not set all features of the struct are disabled but you do not need to remove usage of the methods from the
+ * code.
+ *
+ */
 struct VariableStats
 {
+    /**
+     * @brief Set the new value for provided key
+     *
+     * If the key does not exist this method will create a new one if there is available space.
+     * If the key exists the method will update its value.
+     *
+     * @param name A variable name
+     * @param newValue A new value for the variable
+     * @param persistent true if the value should be saved to persistent storage, false if the value should be kept in RAM.
+     * @return true if the new value of the variable has been saved
+     * @return false if there is no memory to store the new value
+     */
     static bool Set(const char * name, uint32_t newValue, bool persistent = false)
     {
         // TODO add protection against storing too many keys, compare it with size of map
@@ -194,6 +215,17 @@ struct VariableStats
 #endif
     }
 
+    /**
+     * @brief Increment value of given variable name
+     *
+     * If the variable does not exist this method will create a new one, and increment its value automatically if there is available
+     * space.
+     *
+     * @param name A variable name
+     * @param persistent true if the value should be saved to persistent storage, false if the value should be kept in RAM.
+     * @return true if the variable value has been incremented and saved.
+     * @return false if the variable cannot be incremented.
+     */
     static bool Increment(const char * name, bool persistent = false)
     {
 #if CHIP_DEVICE_VARIABLE_STATISTICS
@@ -208,11 +240,24 @@ struct VariableStats
         return false;
     }
 
+    /**
+     * @brief Decrement value of given variable name
+     *
+     * If the variable does not exist this method will not create a new one.
+     *
+     * @param name A variable name
+     * @param persistent true if the value should be saved to persistent storage, false if the value should be kept in RAM.
+     * @return true if the variable value has been decremented and saved.
+     * @return false if the variable cannot be decremented or value does not exist.
+     */
     static bool Decrement(const char * name, bool persistent = false)
     {
 #if CHIP_DEVICE_VARIABLE_STATISTICS
         uint32_t variable = {};
-        Get(name, variable, persistent);
+        if (!Get(name, variable, persistent))
+        {
+            return false;
+        }
 
         if (Set(name, --variable, persistent))
         {
@@ -222,6 +267,15 @@ struct VariableStats
         return false;
     }
 
+    /**
+     * @brief Get value of the given variable name
+     *
+     * @param name A variable name
+     * @param value
+     * @param persistent true if the value should be read form persistent storage, false if the value should be read from RAM.
+     * @return true if the value has been read.
+     * @return false if the value does not exist or could not be read.
+     */
     static bool Get(const char * name, uint32_t & value, bool persistent = false)
     {
 #if CHIP_DEVICE_VARIABLE_STATISTICS
@@ -242,6 +296,16 @@ struct VariableStats
 #endif
     }
 
+    /**
+     * @brief Create and get the List of the saved variables names
+     *
+     * @param keyList output list of the available variables names
+     * @param bufferSize buffer size to store the created variable names
+     * @param persistent true if the list should base on persistent storage names, false if the list should base on variables stored
+     * in RAM.
+     * @return true list has been created
+     * @return false if the list has not been created due to too small bufferSize
+     */
     static bool GetList(char * keyList, size_t bufferSize, bool persistent = false)
     {
 #if CHIP_DEVICE_VARIABLE_STATISTICS
@@ -263,7 +327,9 @@ struct VariableStats
 
 private:
     // TODO parametrize size of the variable map
+#if CHIP_DEVICE_VARIABLE_STATISTICS
     VariablesMap<uint32_t, 10> mVariableMap;
+#endif
 };
 
 } // namespace chip

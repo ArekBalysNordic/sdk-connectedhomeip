@@ -1483,6 +1483,7 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 0
 #endif // CHIP_DEVICE_ENABLE_PORT_PARAMS
 
+// TODO: Disable it by default, add Kconfig for that and GN variable
 /**
  * CHIP_DEVICE_VARIABLE_STATISTICS enables storing statistics for registered variable.
  * It can be used to save and monitor specific values and counters from Matter stack.

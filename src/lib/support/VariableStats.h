@@ -25,6 +25,8 @@
 #include <cstdint>
 #include <functional>
 
+#include <platform/KeyValueStoreManager.h>
+
 #include "IntrusiveList.h"
 
 #define MAXIMUM_VARIABLE_NAME 10
@@ -142,20 +144,28 @@ private:
     uint16_t mElementsCount{ 0 };
 };
 
-class VariableStats
+struct VariableStats
 {
-public:
     static bool Set(const char * name, uint32_t newValue, bool persistent = false)
     {
+        if (persistent)
+        {
+            uint32_t value = newValue;
+            if (DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Put(name, &value, sizeof(value)) != CHIP_NO_ERROR)
+            {
+                return false;
+            }
+        }
+
         return Instance().mVariableMap.Set(name, newValue);
     }
 
-    static bool Increment(const char * name)
+    static bool Increment(const char * name, bool persistent = false)
     {
         uint32_t variable = {};
-        Get(name, variable);
+        Get(name, variable, persistent);
 
-        if (Set(name, ++variable))
+        if (Set(name, ++variable, persistent))
         {
             return true;
         }
@@ -163,12 +173,12 @@ public:
         return false;
     }
 
-    static bool Decrement(const char * name)
+    static bool Decrement(const char * name, bool persistent = false)
     {
         uint32_t variable = {};
-        Get(name, variable);
+        Get(name, variable, persistent);
 
-        if (Set(name, --variable))
+        if (Set(name, --variable, persistent))
         {
             return true;
         }
@@ -176,7 +186,21 @@ public:
         return false;
     }
 
-    static bool Get(const char * name, uint32_t & value) { return Instance().mVariableMap.Get(name, value); }
+    static bool Get(const char * name, uint32_t & value, bool persistent = false)
+    {
+        if (persistent)
+        {
+            uint32_t persistentValue = 0;
+            if (DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Get(name, &persistentValue, sizeof(persistentValue)) ==
+                CHIP_NO_ERROR)
+            {
+                value = persistentValue;
+                return true;
+            }
+            return false;
+        }
+        return Instance().mVariableMap.Get(name, value);
+    }
 
     static VariableStats & Instance()
     {
@@ -185,8 +209,6 @@ public:
     }
 
 private:
-    VariableStats() {}
-
     VariablesMap<uint32_t, 10> mVariableMap;
 };
 

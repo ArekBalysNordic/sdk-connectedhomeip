@@ -450,4 +450,13 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 	help
 	  Enables the BDX protocol for diagnostics log transfer purposes.
 
+config CHIP_IM_PRETTY_PRINT
+	bool "Enable detailed logging of Matter messages"
+	help
+	  Enables enhanced verbosity for logging content of Matter messages. This configuration option
+	  facilitates detailed tracking of interactions, including Cluster ID, Endpoint ID, Attribute ID,
+	  or Command ID as well as payload content for all interaction types (like Read Request or Invoke
+	  Request). This option helps in debugging and development of message exchanges within the Matter
+	  protocol.
+
 endif # CHIP

@@ -833,8 +833,14 @@ exit:
     _log_mbedTLS_error(result);
     return error;
 #else
-    ChipLogError(Crypto, "MBEDTLS_X509_CSR_WRITE_C is not enabled. CSR cannot be created");
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    VerifyOrReturnError(out_csr != nullptr && csr_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+
+    MutableByteSpan csr(out_csr, csr_length);
+    ReturnErrorOnFailure(GenerateCertificateSigningRequest(this, csr));
+    csr_length = csr.size();
+
+    return CHIP_NO_ERROR;
 #endif
 }
 

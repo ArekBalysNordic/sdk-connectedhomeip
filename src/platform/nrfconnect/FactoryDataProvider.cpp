@@ -284,10 +284,16 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
     ByteSpan dacCertSpan{ reinterpret_cast<uint8_t *>(mFactoryData.dac_cert.data), mFactoryData.dac_cert.len };
     chip::Crypto::P256PublicKey dacPublicKey;
 
-    ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
+    const uint8_t kDevelopmentDAC_PublicKey_FFF1_8004[65] = {
+        0x04, 0x50, 0x41, 0x38, 0xef, 0x31, 0xc9, 0xdd, 0x16, 0x0e, 0xb4, 0x6c, 0x6c, 0x17, 0x11, 0x4f, 0x9d,
+        0x72, 0x88, 0x40, 0x80, 0x1f, 0x73, 0xbb, 0x9b, 0x5a, 0x2c, 0x51, 0x91, 0xc9, 0xb2, 0x06, 0x63, 0x01,
+        0x9d, 0x94, 0x76, 0xd1, 0x93, 0x1b, 0x93, 0xff, 0x47, 0xf4, 0x32, 0x56, 0x37, 0x90, 0x35, 0xd2, 0x29,
+        0x62, 0x0b, 0x7e, 0x21, 0x0e, 0x59, 0x2f, 0x26, 0x43, 0x7d, 0x2d, 0x57, 0x62, 0x05,
+    };
+
     ReturnErrorOnFailure(
         LoadKeypairFromRaw(ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac_priv_key.data), mFactoryData.dac_priv_key.len),
-                           ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
+                           ByteSpan(kDevelopmentDAC_PublicKey_FFF1_8004), keypair));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 #endif
 

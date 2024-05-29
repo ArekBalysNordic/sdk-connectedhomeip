@@ -362,19 +362,7 @@ config MBEDTLS_SHA1_C
 config MBEDTLS_SHA256_C
     default y
 
-config MBEDTLS_PK_C
-    default y
-
 config MBEDTLS_PKCS5_C
-    default y
-
-config MBEDTLS_PK_WRITE_C
-    default y
-
-config MBEDTLS_X509_CREATE_C
-    default y
-
-config MBEDTLS_X509_CSR_WRITE_C
     default y
 
 config MBEDTLS_ECP_C
@@ -392,6 +380,18 @@ config MBEDTLS_SSL_OUT_CONTENT_LEN
     default 900 if CHIP_WIFI
 
 # Disable unneeded crypto operations
+
+config MBEDTLS_TLS_LIBRARY
+    default n
+
+config MBEDTLS_X509_LIBRARY
+    default n
+
+config MBEDTLS_X509_CREATE_C
+    default n
+
+config MBEDTLS_X509_CSR_WRITE_C
+    default n
 
 config MBEDTLS_SHA384_C
     default n

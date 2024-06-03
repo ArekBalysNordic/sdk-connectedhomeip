@@ -635,7 +635,7 @@ For example, the build command for the nRF52840 DK could look like this:
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA=y \
--DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA=y \
 -DCONFIG_CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES=y
 ```
 
@@ -783,10 +783,10 @@ directory and build the example with the following option (replace
 `nrf52840dk_nrf52840` with your board name):
 
 ```
-$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DCONFIG_CHIP_FACTORY_DATA_BUILD=y
+$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DSB_CONFIG_MATTER_FACTORY_DATA=y
 ```
 
-Alternatively, you can also add `CONFIG_CHIP_FACTORY_DATA_BUILD=y` Kconfig
+Alternatively, you can also add `SB_CONFIG_MATTER_FACTORY_DATA=y` Kconfig
 setting to the example's `prj.conf` file.
 
 Each factory data parameter has a default value. These are described in the
@@ -802,7 +802,7 @@ them as an additional option for the west command. For example (replace
 `nrf52840dk_nrf52840` with own board name):
 
 ```
-$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y --DCONFIG_CHIP_FACTORY_DATA_BUILD=y --DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
+$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y --DSB_CONFIG_MATTER_FACTORY_DATA=y --DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
 ```
 
 Alternatively, you can add the relevant Kconfig option lines to the example's
@@ -927,7 +927,7 @@ and build an example with the additional option
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA=y \
--DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA=y \
 -DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y
 ```
 
@@ -940,7 +940,7 @@ by building an example with the additional option
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA=y \
--DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
+-DSB_CONFIG_MATTER_FACTORY_DATA=y \
 -DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y \
 -DCONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n
 ```

@@ -33,8 +33,12 @@
 
 #include <dfu/dfu_multi_image.h>
 #include <dfu/dfu_target.h>
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
 #include <dfu/dfu_target_mcuboot.h>
 #include <zephyr/dfu/mcuboot.h>
+#elif defined(CONFIG_SUIT)
+#include <dfu/dfu_target_suit.h>
+#endif
 #include <zephyr/logging/log.h>
 #include <zephyr/pm/device.h>
 
@@ -75,7 +79,11 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 {
     mHeaderParser.Init();
     mParams = {};
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_mcuboot_set_buf(mBuffer, sizeof(mBuffer))));
+#elif defined(CONFIG_SUIT)
+    ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_suit_set_buf(mBuffer, sizeof(mBuffer))));
+#endif
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_multi_image_init(mBuffer, sizeof(mBuffer))));
 
     for (int image_id = 0; image_id < CONFIG_UPDATEABLE_IMAGE_NUMBER; ++image_id)

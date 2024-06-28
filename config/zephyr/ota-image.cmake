@@ -30,6 +30,13 @@ function(chip_ota_image TARGET_NAME)
         message(FATAL_ERROR "Both INPUT_FILES and OUTPUT_FILE arguments must be specified")
     endif()
 
+    if(SYSBUILD)
+        sysbuild_get(CONFIG_CHIP_DEVICE_SOFTWARE_VERSION IMAGE ${DEFAULT_IMAGE} VAR CONFIG_CHIP_DEVICE_SOFTWARE_VERSION KCONFIG)
+        sysbuild_get(CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING IMAGE ${DEFAULT_IMAGE} VAR CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING KCONFIG)
+        sysbuild_get(CONFIG_CHIP_DEVICE_VENDOR_ID IMAGE ${DEFAULT_IMAGE} VAR CONFIG_CHIP_DEVICE_VENDOR_ID KCONFIG)
+        sysbuild_get(CONFIG_CHIP_DEVICE_PRODUCT_ID IMAGE ${DEFAULT_IMAGE} VAR CONFIG_CHIP_DEVICE_PRODUCT_ID KCONFIG)
+    endif()
+
     # Prepare ota_image_tool.py argument list
     if(DEFINED APPVERSION)
         set(OTA_ARGS
@@ -41,6 +48,33 @@ function(chip_ota_image TARGET_NAME)
             ${APPVERSION}
             "--version-str"
             ${APP_VERSION_TWEAK_STRING}
+            "--digest-algorithm"
+            "sha256"
+        )
+    elseif(EXISTS ${APP_DIR}/VERSION)
+        file(READ ${APP_DIR}/VERSION ver)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${APP_DIR}/VERSION)
+        string(REGEX MATCH "VERSION_MAJOR = ([0-9]*)" _ ${ver})
+        set(app_version_major ${CMAKE_MATCH_1})
+        string(REGEX MATCH "VERSION_MINOR = ([0-9]*)" _ ${ver})
+        set(app_version_minor ${CMAKE_MATCH_1})
+        string(REGEX MATCH "PATCHLEVEL = ([0-9]*)" _ ${ver})
+        set(app_version_patchlevel ${CMAKE_MATCH_1})
+        string(REGEX MATCH "VERSION_TWEAK = ([0-9]*)" _ ${ver})
+        set(app_version_tweak ${CMAKE_MATCH_1})
+    
+        set(APP_VERSION_STRING "${app_version_major}.${app_version_minor}.${app_version_patchlevel}+${app_version_tweak}")
+        math(EXPR APPVERSION "(${app_version_major} << 24) | (${app_version_minor} << 16) | (${app_version_patchlevel} << 8) | ${app_version_tweak}" OUTPUT_FORMAT HEXADECIMAL)
+    
+        set(OTA_ARGS
+            "--vendor-id"
+            ${CONFIG_CHIP_DEVICE_VENDOR_ID}
+            "--product-id"
+            ${CONFIG_CHIP_DEVICE_PRODUCT_ID}
+            "--version"
+            ${APPVERSION}
+            "--version-str"
+            ${APP_VERSION_STRING}
             "--digest-algorithm"
             "sha256"
         )
@@ -74,9 +108,15 @@ function(chip_ota_image TARGET_NAME)
         CONTENT ${OTA_ARGS}
     )
 
+    if (CHIP_ROOT)
+        set(CONNECTEDHOMEIP_ROOT ${CHIP_ROOT})
+    else()
+        set(CONNECTEDHOMEIP_ROOT ${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR})
+    endif()
+
     add_custom_command(OUTPUT ${ARG_OUTPUT_FILE}
-        COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/src/app/ota_image_tool.py create @${ARG_OUTPUT_FILE}.args
-        DEPENDS ${ARG_INPUT_FILES} ${CHIP_ROOT}/src/app/ota_image_tool.py
+        COMMAND ${Python3_EXECUTABLE} ${CONNECTEDHOMEIP_ROOT}/src/app/ota_image_tool.py create @${ARG_OUTPUT_FILE}.args
+        DEPENDS ${ARG_INPUT_FILES} ${CONNECTEDHOMEIP_ROOT}/src/app/ota_image_tool.py
     )
 
     add_custom_target(${TARGET_NAME} ALL

@@ -1,0 +1,213 @@
+/*
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "OTAImageProcessorImpl.h"
+
+#include "Reboot.h"
+
+#include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <system/SystemError.h>
+
+#ifdef CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
+#include <credentials/CertificationDeclaration.h>
+#include <platform/Zephyr/ZephyrConfig.h>
+#include <zephyr/settings/settings.h>
+#endif
+
+#include <dfu/dfu_target.h>
+#include <dfu/dfu_target_suit.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/pm/device.h>
+
+namespace chip {
+namespace {
+
+void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
+{
+    DeviceLayer::ChipDeviceEvent otaChange;
+    otaChange.Type                     = DeviceLayer::DeviceEventType::kOtaStateChanged;
+    otaChange.OtaStateChanged.newState = newState;
+    CHIP_ERROR error                   = DeviceLayer::PlatformMgr().PostEvent(&otaChange);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+} // namespace
+
+namespace DeviceLayer {
+
+CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
+{
+    VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    TriggerFlashAction(ExternalFlashManager::Action::WAKE_UP);
+
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+}
+
+CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
+{
+    mHeaderParser.Init();
+    mParams = {};
+
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadInProgress);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::Finalize()
+{
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadComplete);
+    mInProgress = false;
+    return System::MapErrorZephyr(dfu_target_done(true));
+}
+
+CHIP_ERROR OTAImageProcessorImpl::Abort()
+{
+    CHIP_ERROR error = System::MapErrorZephyr(dfu_target_reset());
+    mInProgress      = false;
+    TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
+
+    return error;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::Apply()
+{
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyInProgress);
+    mInProgress = false;
+    // Schedule update of all images
+    int err = dfu_target_schedule_update(-1);
+
+    TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
+
+#ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+    if (!err)
+    {
+        return SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS),
+            [](System::Layer *, void * /* context */) {
+                PlatformMgr().HandleServerShuttingDown();
+                k_msleep(CHIP_DEVICE_CONFIG_SERVER_SHUTDOWN_ACTIONS_SLEEP_MS);
+                Reboot(SoftwareRebootReason::kSoftwareUpdate);
+            },
+            nullptr /* context */);
+    }
+    else
+    {
+        PostOTAStateChangeEvent(DeviceLayer::kOtaApplyFailed);
+        return System::MapErrorZephyr(err);
+    }
+#else
+    return System::MapErrorZephyr(err);
+#endif
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
+{
+    VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    CHIP_ERROR error = ProcessHeader(aBlock);
+
+    if (!mInProgress && error == CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_suit_set_buf(mBuffer, sizeof(mBuffer))));
+        ReturnErrorOnFailure(System::MapErrorZephyr(
+            dfu_target_init(DFU_TARGET_IMAGE_TYPE_SUIT, 0, static_cast<size_t>(mParams.totalFileBytes), nullptr)));
+        mInProgress = true;
+    }
+
+    if (error == CHIP_NO_ERROR)
+    {
+        // DFU target library buffers data internally, so do not clone the block data.
+        if (mParams.downloadedBytes > std::numeric_limits<size_t>::max())
+        {
+            error = CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        else
+        {
+            System::MapErrorZephyr(dfu_target_write(aBlock.data(), aBlock.size()));
+            mParams.downloadedBytes += aBlock.size();
+        }
+    }
+
+    // Report the result back to the downloader asynchronously.
+    return DeviceLayer::SystemLayer().ScheduleLambda([this, error, aBlock] {
+        if (error == CHIP_NO_ERROR)
+        {
+            ChipLogDetail(SoftwareUpdate, "Downloaded %u/%u bytes", static_cast<unsigned>(mParams.downloadedBytes),
+                          static_cast<unsigned>(mParams.totalFileBytes));
+            mDownloader->FetchNextData();
+        }
+        else
+        {
+            mDownloader->EndDownload(error);
+            PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+        }
+    });
+}
+
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    OTARequestorInterface * requestor = GetRequestorInstance();
+    ReturnErrorCodeIf(requestor == nullptr, false);
+
+    uint32_t currentVersion;
+    ReturnErrorCodeIf(ConfigurationMgr().GetSoftwareVersion(currentVersion) != CHIP_NO_ERROR, false);
+
+    return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying &&
+        requestor->GetTargetVersion() == currentVersion;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
+    return mImageConfirmed ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
+{
+    if (mHeaderParser.IsInitialized())
+    {
+        OTAImageHeader header;
+        CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(aBlock, header);
+
+        // Needs more data to decode the header
+        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(error);
+
+        mParams.totalFileBytes = header.mPayloadSize;
+        mHeaderParser.Clear();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void OTAImageProcessorImpl::TriggerFlashAction(ExternalFlashManager::Action action)
+{
+    if (mFlashHandler)
+    {
+        mFlashHandler->DoAction(action);
+    }
+}
+
+} // namespace DeviceLayer
+} // namespace chip

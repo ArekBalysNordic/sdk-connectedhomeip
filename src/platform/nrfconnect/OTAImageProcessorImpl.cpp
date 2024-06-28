@@ -31,13 +31,13 @@
 #include <zephyr/settings/settings.h>
 #endif
 
-#include <dfu/dfu_multi_image.h>
 #include <dfu/dfu_target.h>
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
+#ifdef CONFIG_SUIT
+#include <dfu/dfu_target_suit.h>
+#else
+#include <dfu/dfu_multi_image.h>
 #include <dfu/dfu_target_mcuboot.h>
 #include <zephyr/dfu/mcuboot.h>
-#elif defined(CONFIG_SUIT)
-#include <dfu/dfu_target_suit.h>
 #endif
 #include <zephyr/logging/log.h>
 #include <zephyr/pm/device.h>
@@ -79,11 +79,9 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 {
     mHeaderParser.Init();
     mParams = {};
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
+
+#ifndef CONFIG_SUIT
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_mcuboot_set_buf(mBuffer, sizeof(mBuffer))));
-#elif defined(CONFIG_SUIT)
-    ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_suit_set_buf(mBuffer, sizeof(mBuffer))));
-#endif
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_multi_image_init(mBuffer, sizeof(mBuffer))));
 
     for (int image_id = 0; image_id < CONFIG_UPDATEABLE_IMAGE_NUMBER; ++image_id)
@@ -96,6 +94,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 
         ReturnErrorOnFailure(System::MapErrorZephyr(dfu_multi_image_register_writer(&writer)));
     };
+#endif
 
 #ifdef CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
     dfu_image_writer cdWriter;
@@ -120,13 +119,22 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadComplete);
+    mInProgress = false;
+#ifdef CONFIG_SUIT
+    return System::MapErrorZephyr(dfu_target_done(true));
+#else
     return System::MapErrorZephyr(dfu_multi_image_done(true));
+#endif
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
+#ifdef CONFIG_SUIT
+    CHIP_ERROR error = System::MapErrorZephyr(dfu_target_reset());
+#else
     CHIP_ERROR error = System::MapErrorZephyr(dfu_multi_image_done(false));
-
+#endif
+    mInProgress = false;
     TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
 
@@ -136,6 +144,7 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
     PostOTAStateChangeEvent(DeviceLayer::kOtaApplyInProgress);
+    mInProgress = false;
     // Schedule update of all images
     int err = dfu_target_schedule_update(-1);
 
@@ -168,6 +177,15 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR error = ProcessHeader(aBlock);
+#ifdef CONFIG_SUIT
+    if (!mInProgress && error == CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_suit_set_buf(mBuffer, sizeof(mBuffer))));
+        ReturnErrorOnFailure(System::MapErrorZephyr(
+            dfu_target_init(DFU_TARGET_IMAGE_TYPE_SUIT, 0, static_cast<size_t>(mParams.totalFileBytes), nullptr)));
+        mInProgress = true;
+    }
+#endif
 
     if (error == CHIP_NO_ERROR)
     {
@@ -178,8 +196,12 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
         }
         else
         {
-            error = System::MapErrorZephyr(
-                dfu_multi_image_write(static_cast<size_t>(mParams.downloadedBytes), aBlock.data(), aBlock.size()));
+#ifdef CONFIG_SUIT
+            int err = dfu_target_write(aBlock.data(), aBlock.size());
+#else
+            int err = dfu_multi_image_write(static_cast<size_t>(mParams.downloadedBytes), aBlock.data(), aBlock.size());
+#endif
+            error = System::MapErrorZephyr(err);
             mParams.downloadedBytes += aBlock.size();
         }
     }

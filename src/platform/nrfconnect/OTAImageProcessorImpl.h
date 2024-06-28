@@ -57,6 +57,7 @@ protected:
 
 private:
     bool mImageConfirmed = false;
+    bool mInProgress     = false;
 };
 
 } // namespace DeviceLayer

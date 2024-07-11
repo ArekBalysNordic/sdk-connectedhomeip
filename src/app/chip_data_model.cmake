@@ -76,7 +76,7 @@ endfunction()
 
 function(chip_configure_data_model APP_TARGET)
     set(SCOPE PRIVATE)
-    cmake_parse_arguments(ARG "INCLUDE_SERVER;BYPASS_IDL" "SCOPE;ZAP_FILE;GEN_DIR;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
+    cmake_parse_arguments(ARG "INCLUDE_SERVER;BYPASS_IDL;GEN_FROM_APP" "SCOPE;ZAP_FILE;GEN_DIR;IDL" "EXTERNAL_CLUSTERS" ${ARGN})
 
     if(ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
@@ -106,7 +106,12 @@ function(chip_configure_data_model APP_TARGET)
         endif()
     endif()
 
-    if (ARG_IDL AND NOT ARG_BYPASS_IDL)
+    if(ARG_GEN_FROM_APP)
+        set(APP_GEN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/zap_generated)
+        target_compile_definitions(${APP_TARGET} PRIVATE CHIP_GEN_FROM_APP)
+    endif()
+
+    if (ARG_IDL AND ARG_GEN_FROM_APP AND NOT ARG_BYPASS_IDL)
         chip_codegen(${APP_TARGET}-codegen
             INPUT "${ARG_IDL}"
             GENERATOR "cpp-app"

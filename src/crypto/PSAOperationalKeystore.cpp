@@ -277,25 +277,30 @@ CHIP_ERROR PSAOperationalKeystore::MigrateOpKeypairForFabric(FabricIndex fabricI
                                                              OperationalKeystore & operationalKeystore) const
 {
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    ChipLogError(DeviceLayer, "X0");
 
     P256SerializedKeypair serializedKeypair;
 
     // Do not allow overwriting the existing key and just remove it from the previous Operational Keystore if needed.
     if (!HasOpKeypairForFabric(fabricIndex))
     {
+        ChipLogError(DeviceLayer, "X1");
         ReturnErrorOnFailure(operationalKeystore.ExportOpKeypairForFabric(fabricIndex, serializedKeypair));
-
+        ChipLogError(DeviceLayer, "X2");
         PersistentP256Keypair keypair(fabricIndex);
         ReturnErrorOnFailure(keypair.Deserialize(serializedKeypair));
-
+        ChipLogError(DeviceLayer, "X3");
         // Migrated key is not useful anymore, remove it from the previous keystore.
         ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
+        ChipLogError(DeviceLayer, "X4");
     }
     else if (operationalKeystore.HasOpKeypairForFabric(fabricIndex))
     {
+        ChipLogError(DeviceLayer, "X5");
         ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
     }
 
+    ChipLogError(DeviceLayer, "X6");
     return CHIP_NO_ERROR;
 }
 

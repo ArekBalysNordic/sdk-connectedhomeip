@@ -69,24 +69,30 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
     psa_set_key_type(&attributes, PSA_KEY_TYPE_SPAKE2P_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_R1));
 
     psa_status_t status = psa_import_key(&attributes, password, w0in_len + Lin_len, &mKey);
+    ChipLogError(Crypto, "BeginVerifier: psa_import_key status: %d", status);
 
     psa_reset_key_attributes(&attributes);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_setup(&mOperation, mKey, &cp);
+    ChipLogError(Crypto, "BeginVerifier: psa_pake_setup status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     mRole  = PSA_PAKE_ROLE_SERVER;
     status = psa_pake_set_role(&mOperation, PSA_PAKE_ROLE_SERVER);
+    ChipLogError(Crypto, "BeginVerifier: psa_pake_set_role status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_set_peer(&mOperation, peer_identity, peer_identity_len);
+    ChipLogError(Crypto, "BeginVerifier: psa_pake_set_peer status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_set_user(&mOperation, my_identity, my_identity_len);
+    ChipLogError(Crypto, "BeginVerifier: psa_pake_set_user status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_set_context(&mOperation, mContext, mContextLen);
+    ChipLogError(Crypto, "BeginVerifier: psa_pake_set_context status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -114,24 +120,30 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
     psa_set_key_type(&attributes, PSA_KEY_TYPE_SPAKE2P_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
 
     psa_status_t status = psa_import_key(&attributes, password, w0in_len + w1in_len, &mKey);
+    ChipLogError(Crypto, "BeginProver: psa_import_key status: %d", status);
 
     psa_reset_key_attributes(&attributes);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_setup(&mOperation, mKey, &cp);
+    ChipLogError(Crypto, "BeginProver: psa_pake_setup status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     mRole  = PSA_PAKE_ROLE_CLIENT;
     status = psa_pake_set_role(&mOperation, PSA_PAKE_ROLE_CLIENT);
+    ChipLogError(Crypto, "BeginProver: psa_pake_set_role status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_set_user(&mOperation, my_identity, my_identity_len);
+    ChipLogError(Crypto, "BeginProver: psa_pake_set_user status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_set_peer(&mOperation, peer_identity, peer_identity_len);
+    ChipLogError(Crypto, "BeginProver: psa_pake_set_peer status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_set_context(&mOperation, mContext, mContextLen);
+    ChipLogError(Crypto, "BeginProver: psa_pake_set_context status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -146,10 +158,12 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::ComputeRoundOne(const uint8_t * pab
     if (mRole == PSA_PAKE_ROLE_SERVER)
     {
         status = psa_pake_input(&mOperation, PSA_PAKE_STEP_KEY_SHARE, pab, pab_len);
+        ChipLogError(Crypto, "ComputeRoundOne: psa_pake_input status: %d", status);
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
     }
 
     status = psa_pake_output(&mOperation, PSA_PAKE_STEP_KEY_SHARE, out, *out_len, out_len);
+    ChipLogError(Crypto, "ComputeRoundOne: psa_pake_output status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -164,10 +178,12 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
     if (mRole == PSA_PAKE_ROLE_CLIENT)
     {
         status = psa_pake_input(&mOperation, PSA_PAKE_STEP_KEY_SHARE, in, in_len);
+        ChipLogError(Crypto, "ComputeRoundTwo: psa_pake_input status: %d", status);
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
     }
 
     status = psa_pake_output(&mOperation, PSA_PAKE_STEP_CONFIRM, out, *out_len, out_len);
+    ChipLogError(Crypto, "ComputeRoundTwo: psa_pake_output status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -176,6 +192,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
 CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size_t in_len)
 {
     psa_status_t status = psa_pake_input(&mOperation, PSA_PAKE_STEP_CONFIRM, in, in_len);
+    ChipLogError(Crypto, "KeyConfirm: psa_pake_input status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -192,6 +209,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(SessionKeystore & keystore,
     psa_set_key_algorithm(&attributes, PSA_ALG_HKDF(PSA_ALG_SHA_256));
 
     psa_status_t status = psa_pake_get_shared_key(&(mOperation), &attributes, &keyId);
+    ChipLogError(Crypto, "GetKeys: psa_pake_get_shared_key status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;

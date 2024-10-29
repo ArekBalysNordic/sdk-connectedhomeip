@@ -72,9 +72,11 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
     psa_set_key_id(&attributes, GetKeyId());
 
     status = psa_generate_key(&attributes, &keyId);
+    ChipLogError(Crypto, "Generate: psa_generate_key status: %d", status);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     status = psa_export_public_key(keyId, mPublicKey.Bytes(), mPublicKey.Length(), &publicKeyLength);
+    ChipLogError(Crypto, "Generate: psa_export_public_key status: %d", status);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(publicKeyLength == kP256_PublicKey_Length, error = CHIP_ERROR_INTERNAL);
 
@@ -155,6 +157,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256Serial
     psa_set_key_id(&attributes, GetKeyId());
 
     status = psa_import_key(&attributes, input.ConstBytes() + mPublicKey.Length(), kP256_PrivateKey_Length, &keyId);
+    ChipLogError(Crypto, "Deserialize: psa_import_key status: %d", status);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     memcpy(mPublicKey.Bytes(), input.ConstBytes(), mPublicKey.Length());
@@ -196,6 +199,7 @@ CHIP_ERROR PSAOperationalKeystore::ExportOpKeypairForFabric(FabricIndex fabricIn
     size_t outSize = 0;
     psa_status_t status =
         psa_export_key(PersistentP256Keypair(fabricIndex).GetKeyId(), outKeypair.Bytes(), outKeypair.Capacity(), &outSize);
+    ChipLogError(Crypto, "ExportOpKeypairForFabric: psa_export_key status: %d", status);
 
     if (status == PSA_ERROR_BUFFER_TOO_SMALL)
     {

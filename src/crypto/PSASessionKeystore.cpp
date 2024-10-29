@@ -92,6 +92,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & ke
     AesKeyAttributes attrs;
     psa_status_t status =
         psa_import_key(&attrs.Get(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray), &key.AsMutable<psa_key_id_t>());
+    ChipLogError(Crypto, "CreateKey (Aes128KeyHandle): psa_import_key status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -105,7 +106,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & ke
     HmacKeyAttributes attrs;
     psa_status_t status =
         psa_import_key(&attrs.Get(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray), &key.AsMutable<psa_key_id_t>());
-
+    ChipLogError(Crypto, "CreateKey (Hmac128KeyHandle): psa_import_key status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -118,7 +119,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const ByteSpan & keyMaterial, HkdfKeyHa
 
     HkdfKeyAttributes attrs;
     psa_status_t status = psa_import_key(&attrs.Get(), keyMaterial.data(), keyMaterial.size(), &key.AsMutable<psa_key_id_t>());
-
+    ChipLogError(Crypto, "CreateKey (HkdfKeyHandle): psa_import_key status: %d", status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -132,7 +133,9 @@ CHIP_ERROR PSASessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, c
 
     AesKeyAttributes attrs;
 
-    return kdf.DeriveKey(attrs.Get(), key.AsMutable<psa_key_id_t>());
+    CHIP_ERROR error = kdf.DeriveKey(attrs.Get(), key.AsMutable<psa_key_id_t>());
+    ChipLogError(Crypto, "DeriveKey: kdf.DeriveKey status: %d", error.AsInteger());
+    return error;
 }
 
 CHIP_ERROR PSASessionKeystore::DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info,

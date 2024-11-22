@@ -145,11 +145,22 @@ static_library("crypto") {
 
   if (chip_crypto == "psa") {
     sources += [
-      "PSAOperationalKeystore.cpp",
       "PSAOperationalKeystore.h",
       "PSASessionKeystore.cpp",
       "PSASessionKeystore.h",
     ]
+
+    if(chip_crypto_psa_use_kmu)
+    {
+      sources += [
+        "PSAKMUOperationalKeystore.cpp",
+      ]
+    } else
+    {
+      sources += [
+        "PSAOperationalKeystore.cpp",
+      ]
+    }
   } else {
     sources += [
       "RawKeySessionKeystore.cpp",

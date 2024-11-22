@@ -40,6 +40,21 @@ config CHIP_WIFI
 	imply NET_STATISTICS_IPV6
 	imply NET_STATISTICS_USER_API
 
+config CHIP_CRYPTO_PSA_KMU
+	bool "Use KMU to store persistent keys"
+	depends on SOC_SERIES_NRF54LX
+	default y
+	help
+	  Uses Key Management Unit module to store persistent keys if the PSA ITS
+	  is disabled.
+
+config CHIP_CRYPTO_PSA_KMU_ENCRYPTION
+	bool "Use encryption while storing persistent keys in KMU"
+	depends on CHIP_CRYPTO_PSA_KMU
+	help
+	  Uses encryption while storing persistent keys in Key Management Unit.
+	  This operation costs two KMU slots more than without encryption.
+
 config CHIP_QSPI_NOR
 	bool "Enable QSPI NOR feature set"
 	imply NORDIC_QSPI_NOR

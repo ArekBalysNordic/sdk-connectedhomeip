@@ -54,6 +54,8 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+#include <mpsl.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -201,6 +203,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #ifdef CONFIG_NET_L2_OPENTHREAD
     ThreadStackMgr().LockThreadStack();
 #endif
+
+    mpsl_uninit();
 
 #ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
     void * storage = nullptr;

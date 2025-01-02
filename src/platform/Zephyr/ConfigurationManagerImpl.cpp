@@ -204,7 +204,9 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ThreadStackMgr().LockThreadStack();
 #endif
 
-    //  Do device-specific actions before erasing the settings and performing factory reset.
+    ConnectivityMgr().ErasePersistentInfo();
+
+    //  Do device-specific actions before erasing the settings and rebooting device.
     if (sDeviceFactoryResetCallback)
     {
         ChipLogProgress(DeviceLayer, "Cleaning device-specific data...");
@@ -236,7 +238,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
         ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    ConnectivityMgr().ErasePersistentInfo();
 #endif // CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
 
     PlatformMgr().Shutdown();

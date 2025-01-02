@@ -36,12 +36,21 @@ namespace DeviceLayer {
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::ZephyrConfig>
 {
 public:
+    using DeviceFactoryResetCallback = void (*)(intptr_t);
+
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
+
+    /**
+     * @brief Set a callback to be called before erasing the settings and performing factory reset.
+     *
+     * @param clbk A function pointer to the callback function.
+     */
+    static void SetFactoryResetDeviceCallback(DeviceFactoryResetCallback clbk) { sDeviceFactoryResetCallback = clbk; }
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -72,6 +81,8 @@ private:
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
+
+    static DeviceFactoryResetCallback sDeviceFactoryResetCallback;
 };
 
 inline bool ConfigurationManagerImpl::CanFactoryReset()

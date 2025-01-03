@@ -10,3 +10,8 @@ west-commands:
       - name: zap-gui
         class: ZapGui
         help: Run Matter ZCL Advanced Platform (ZAP) GUI
+  - file: scripts/west/zcl_generate.py
+    commands:
+      - name: zcl-generate
+        class: ZCLGenerate
+        help: Generate ZCL Matter Data Model file

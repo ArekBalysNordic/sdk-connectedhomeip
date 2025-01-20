@@ -284,17 +284,25 @@ CHIP_ERROR PSAOperationalKeystore::MigrateOpKeypairForFabric(FabricIndex fabricI
     // Do not allow overwriting the existing key and just remove it from the previous Operational Keystore if needed.
     if (!HasOpKeypairForFabric(fabricIndex))
     {
-        ReturnErrorOnFailure(operationalKeystore.ExportOpKeypairForFabric(fabricIndex, serializedKeypair));
+        CHIP_ERROR err = operationalKeystore.ExportOpKeypairForFabric(fabricIndex, serializedKeypair);
+        ChipLogError(Crypto, "Exporting OP keypair for fabric: %u: %s", fabricIndex, ErrorStr(err));
+        ReturnErrorOnFailure(err);
 
         PersistentP256Keypair keypair(fabricIndex);
-        ReturnErrorOnFailure(keypair.Deserialize(serializedKeypair));
+        err = keypair.Deserialize(serializedKeypair);
+        ChipLogError(Crypto, "Keypair deserialize: %u: %s", fabricIndex, ErrorStr(err));
+        ReturnErrorOnFailure(err);
 
         // Migrated key is not useful anymore, remove it from the previous keystore.
-        ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
+        err = operationalKeystore.RemoveOpKeypairForFabric(fabricIndex);
+        ChipLogError(Crypto, "Remove OP keypair for fabric: %u: %s", fabricIndex, ErrorStr(err));
+        ReturnErrorOnFailure(err);
     }
     else if (operationalKeystore.HasOpKeypairForFabric(fabricIndex))
     {
-        ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
+        CHIP_ERROR err = operationalKeystore.RemoveOpKeypairForFabric(fabricIndex);
+        ChipLogError(Crypto, "Remove OP keypair for fabric if already exists: %u: %s", fabricIndex, ErrorStr(err));
+        ReturnErrorOnFailure(err);
     }
 
     return CHIP_NO_ERROR;

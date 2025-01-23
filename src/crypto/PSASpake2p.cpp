@@ -17,8 +17,6 @@
 
 #include "PSASpake2p.h"
 
-#include "CHIPCryptoPALPSA.h"
-
 #include <lib/support/CodeUtils.h>
 
 #include <psa/crypto.h>

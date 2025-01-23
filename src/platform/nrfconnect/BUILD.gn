@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nrfconnect/args.gni")
 
@@ -130,6 +131,21 @@ static_library("nrfconnect") {
 
   if (chip_malloc_sys_heap) {
     sources += [ "../Zephyr/SysHeapMalloc.cpp" ]
+  }
+
+  if (chip_use_cracen_kmu) {
+    # Use platform crypto implementation for KMU support
+    sources += [
+      "crypto/KMUOperationalKeystore.cpp",
+      "crypto/KMUSessionKeystore.cpp",
+
+    # Sources from common crypto core
+      "${chip_root}/src/crypto/CHIPCryptoPALPSA.cpp",
+      "${chip_root}/src/crypto/CHIPCryptoPALPSA.h",
+      "${chip_root}/src/crypto/PSAOperationalKeystore.h",
+      "${chip_root}/src/crypto/PSASpake2p.cpp",
+      "${chip_root}/src/crypto/PSASpake2p.h",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

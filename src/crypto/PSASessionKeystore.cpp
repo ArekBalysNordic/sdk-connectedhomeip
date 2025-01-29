@@ -33,6 +33,7 @@ public:
         psa_set_key_algorithm(&mAttrs, algorithm);
         psa_set_key_usage_flags(&mAttrs, usageFlags);
         psa_set_key_bits(&mAttrs, bits);
+        PSAKeyAllocator::Get()->UpdateKeyAttributes(&mAttrs);
     }
 
     ~KeyAttributesBase() { psa_reset_key_attributes(&mAttrs); }
@@ -189,9 +190,10 @@ void PSASessionKeystore::DestroyKey(HkdfKeyHandle & key)
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 CHIP_ERROR PSASessionKeystore::PersistICDKey(Symmetric128BitsKeyHandle & key)
 {
-    CHIP_ERROR err;
-    psa_key_id_t newKeyId      = PSA_KEY_ID_NULL;
-    psa_key_attributes_t attrs = PSA_KEY_ATTRIBUTES_INIT;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    psa_key_id_t newKeyId = PSA_KEY_ID_NULL;
+    psa_key_attributes_t attrs;
+    psa_status_t status;
 
     psa_get_key_attributes(key.As<psa_key_id_t>(), &attrs);
 
@@ -202,10 +204,13 @@ CHIP_ERROR PSASessionKeystore::PersistICDKey(Symmetric128BitsKeyHandle & key)
         return CHIP_NO_ERROR;
     }
 
-    SuccessOrExit(err = Crypto::FindFreeKeySlotInRange(newKeyId, to_underlying(KeyIdBase::ICDKeyRangeStart), kMaxICDClientKeys));
-    psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_PERSISTENT);
-    psa_set_key_id(&attrs, newKeyId);
-    VerifyOrExit(psa_copy_key(key.As<psa_key_id_t>(), &attrs, &newKeyId) == PSA_SUCCESS, err = CHIP_ERROR_INTERNAL);
+    newKeyId = PSAKeyAllocator::Get()->AllocateICDKeyId();
+    ChipLogError(Crypto, "\n\nAllocated ICD key ID: 0x%x", newKeyId);
+    VerifyOrExit(PSA_KEY_ID_NULL != newKeyId, err = CHIP_ERROR_INTERNAL);
+    PSAKeyAllocator::Get()->UpdateKeyAttributes(&attrs);
+    status = psa_copy_key(key.As<psa_key_id_t>(), &attrs, &newKeyId);
+    ChipLogError(Crypto, "\n\nCopied ICD key ID: %d", status);
+    VerifyOrExit(status == PSA_SUCCESS, err = CHIP_ERROR_INTERNAL);
 
 exit:
     DestroyKey(key);

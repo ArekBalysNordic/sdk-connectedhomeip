@@ -289,4 +289,32 @@ config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
 	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
 	  avoiding race conditions before the device removes non-volatile data.
 
+config CHIP_KMU_SUPPORT
+	bool "Use KMU to store crypto keys"
+	default y
+	depends on CRACEN_LIB_KMU
+	help
+	  Uses KMU to store keys if it is available on the device. This option changes the Matter crypto
+	  implementation to "platform" and uses custom crypto implementation of Session Keystore and
+	  Operational Keystore.
+
+if CHIP_KMU_SUPPORT
+
+	config CHIP_CORE_KMU_SLOT_START
+	int "Initial KMU slot number for Matter keys"
+	default 100
+	help
+	  Starting slot number dedicated for Matter purposes.
+	  This config does not include DAC private key.
+
+	config CHIP_CORE_KMU_SLOT_END
+	int
+	default 175 if CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU
+	default 180
+	help
+	  The last available KMU slot for Matter purposes.
+	  This slot does not include DAC private key.
+
+endif # CHIP_KMU_SUPPORT
+
 endif # CHIP

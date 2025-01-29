@@ -46,6 +46,9 @@
 namespace chip {
 namespace Crypto {
 
+PSADefaultKeyAllocator DefaultPSAKeyAllocator;
+PSAKeyAllocator * PSAKeyAllocator::sInstance = &DefaultPSAKeyAllocator;
+
 namespace {
 
 bool isBufferNonEmpty(const uint8_t * data, size_t data_length)

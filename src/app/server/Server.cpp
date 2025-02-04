@@ -842,4 +842,9 @@ Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystor
 app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
 #endif
 
+void ServerScheduleFactoryReset()
+{
+    chip::Server::GetInstance().ScheduleFactoryReset();
+}
+
 } // namespace chip

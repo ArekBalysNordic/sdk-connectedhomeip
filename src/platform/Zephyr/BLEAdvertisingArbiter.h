@@ -80,8 +80,8 @@ CHIP_ERROR Init(uint8_t btId);
  * has higher priority than other requests in the list, restart the BLE
  * advertising immediately using parameters defined in the new request.
  *
- * Inserting a request object that is already registered at the advertising
- * arbiter automatically cancels the previous request.
+ * Inserting a request object with the same priority that is already registered
+ * at the advertising arbiter automatically cancels the previous request.
  *
  * @note This method does not take ownership of the request object so the object
  *       must not get destroyed before it is cancelled.

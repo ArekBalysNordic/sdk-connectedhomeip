@@ -20,6 +20,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemError.h>
+#include <zephyr/bluetooth/conn.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -64,6 +65,11 @@ CHIP_ERROR RestartAdvertising()
     const int result = bt_le_adv_start(&params, top.advertisingData.data(), top.advertisingData.size(), top.scanResponseData.data(),
                                        top.scanResponseData.size());
 
+    if (result == -ENOMEM)
+    {
+        ChipLogProgress(DeviceLayer, "Advertising start failed, will retry once connection is released");
+    }
+
     if (top.onStarted != nullptr)
     {
         top.onStarted(result);
@@ -72,6 +78,18 @@ CHIP_ERROR RestartAdvertising()
     return System::MapErrorZephyr(result);
 }
 
+BT_CONN_CB_DEFINE(conn_callbacks) = {
+    .recycled =
+        []() {
+            if (!sys_slist_is_empty(&sRequests))
+            {
+                // Starting from Zephyr 4.0 Automatic advertiser resumption is deprecated,
+                // so the BLE Advertising Arbiter has to take over the responsibility of restarting the advertiser.
+                // Restart advertising in this callback if there are pending requests after the connection is released.
+                RestartAdvertising();
+            }
+        },
+};
 } // namespace
 
 CHIP_ERROR Init(uint8_t btId)
@@ -94,14 +112,18 @@ CHIP_ERROR InsertRequest(Request & request)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    CancelRequest(request);
-
     sys_snode_t * prev = nullptr;
     sys_snode_t * node = nullptr;
 
     // Find position of the request in the list that preserves ordering by priority
     SYS_SLIST_FOR_EACH_NODE(&sRequests, node)
     {
+        // Automatically cancel the request with the same priority
+        if (request.priority == ToRequest(node).priority)
+        {
+            CancelRequest(request);
+        }
+
         if (request.priority < ToRequest(node).priority)
         {
             break;
@@ -135,7 +157,6 @@ void CancelRequest(Request & request)
     {
         return;
     }
-
     const bool isTopPriority = (sys_slist_peek_head(&sRequests) == &request);
     VerifyOrReturn(sys_slist_find_and_remove(&sRequests, &request));
 

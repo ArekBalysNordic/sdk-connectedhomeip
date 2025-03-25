@@ -625,6 +625,15 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     SuccessOrExit(err);
 
     ChipLogDetail(DataManagement, "<RE> Sending report (payload has %" PRIu32 " bytes)...", reportDataWriter.GetLengthWritten());
+
+    {
+        ReportDataMessage::Parser report;
+        System::PacketBufferTLVReader reader;
+        reader.Init(bufHandle.CloneData());
+        report.Init(reader);
+        report.PrettyPrint();
+    }
+
     err = SendReport(apReadHandler, std::move(bufHandle), hasMoreChunks);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(DataManagement, "<RE> Error sending out report data with %" CHIP_ERROR_FORMAT "!", err.Format()));

@@ -13,6 +13,7 @@ import tempfile
 import wget
 import json
 import signal
+import sys
 
 from collections import deque
 from pathlib import Path
@@ -24,6 +25,17 @@ from west import log
 DEFAULT_MATTER_PATH = Path(__file__).parents[2]
 DEFAULT_ZCL_JSON_RELATIVE_PATH = Path('src/app/zap-templates/zcl/zcl.json')
 DEFAULT_APP_TEMPLATES_RELATIVE_PATH = Path('src/app/zap-templates/app-templates.json')
+
+
+def add_to_path(path: str) -> None:
+    """
+    Add a path to the PATH environment variable.
+    Outputs shell commands to stdout that should be evaluated by the parent shell.
+    """
+    if platform.system() == "Windows":
+        print(f'set "PATH={path};%PATH%"')
+    else:
+        print(f'export PATH="{path}{os.pathsep}$PATH"')
 
 
 def find_zap(root: Path = Path.cwd(), max_depth: int = 2):
@@ -96,7 +108,7 @@ def update_zcl_in_zap(zap_file: Path, zcl_json: Path, app_templates: Path) -> bo
         for package in packages:
             if package.get("type") == "zcl-properties":
                 if zcl_json.parent.absolute() == zap_file.parent.absolute() or \
-                    not zcl_json.parent.absolute().is_relative_to(zap_file.parent.absolute()):
+                        not zcl_json.parent.absolute().is_relative_to(zap_file.parent.absolute()):
                     try:
                         package.update({"path": str(zcl_json.absolute().relative_to(zap_file.parent.absolute(), walk_up=True))})
                         updated = True
@@ -106,7 +118,7 @@ def update_zcl_in_zap(zap_file: Path, zcl_json: Path, app_templates: Path) -> bo
 
             if package.get("type") == "gen-templates-json":
                 if app_templates.parent.absolute() == zap_file.parent.absolute() or \
-                    not app_templates.parent.absolute().is_relative_to(zap_file.parent.absolute()):
+                        not app_templates.parent.absolute().is_relative_to(zap_file.parent.absolute()):
                     try:
                         package.update({"path": str(app_templates.absolute().relative_to(zap_file.parent.absolute(), walk_up=True))})
                         updated = True

@@ -37,6 +37,8 @@ class ZapGenerate(WestCommand):
                             help='Path where to store the generated files')
         parser.add_argument('-m', '--matter-path', type=existing_dir_path,
                             default=DEFAULT_MATTER_PATH, help='Path to Matter SDK')
+        parser.add_argument('-x', '--extra_culsters', action='store_true', help='Generate extra cluster')
+        parser.add_argument('-s', '--simple', action='store_true', help='Generate only a .matter file')
         parser.add_argument('-f', '--full', action='store_true', help='Generate full data model files')
         parser.add_argument('-k', '--keep-previous', action='store_true', help='Keep previously generated files')
         return parser
@@ -50,8 +52,15 @@ class ZapGenerate(WestCommand):
             cmd = [sys.executable, self.zap_generate_path, zap_file_path, "-o", output_path, "-t", templates_path]
         return [str(x) for x in cmd]
 
+    def pregen_command(self, zap_file_path, output_path):
+        print(zap_file_path.name)
+        cmd = [sys.executable, self.pregen_path, f"{zap_file_path.parent}/{zap_file_path.stem}.matter",
+               "-g", "cpp-sdk", "--output-dir", output_path]
+        return [str(x) for x in cmd]
+
     def do_run(self, args, unknown_args):
         self.zap_generate_path = args.matter_path / "scripts/tools/zap/generate.py"
+        self.pregen_path = args.matter_path / "scripts/codegen.py"
 
         if args.zap_file:
             zap_file_path = args.zap_file.absolute()
@@ -81,17 +90,19 @@ class ZapGenerate(WestCommand):
         if not args.keep_previous:
             self.clear_generated_files(output_path)
 
-        # Generate source files
-        self.check_call(self.build_command(zap_file_path, output_path, app_templates_path))
-
         # Generate .matter file
         self.check_call(self.build_command(zap_file_path, output_path))
+
+        if not args.simple:
+            # Generate source files
+            self.check_call(self.build_command(zap_file_path, output_path, app_templates_path))
 
         if args.full:
             output_path = output_path / "app-common/zap-generated"
             output_path.mkdir(parents=True, exist_ok=True)
 
             self.check_call(self.build_command(zap_file_path, output_path, templates_path))
+            self.check_call(self.pregen_command(zap_file_path, output_path / "clusters"))
 
         log.inf(f"Done. Files generated in {output_path}")
 

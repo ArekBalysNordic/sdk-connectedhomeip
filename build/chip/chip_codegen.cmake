@@ -136,10 +136,13 @@ endfunction()
 #   OUTPUT_FILES - [OUT] output variable will contain the path of generated files.
 #                  suitable to be added within a build target
 #
+#   ZAP_INSTALL_PATH - [IN] path to zap-cli installation, if not set, the script will
+#                       try to find it in the PATH
+#
 function(chip_zapgen TARGET_NAME)
     cmake_parse_arguments(ARG
          ""
-         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES"
+         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES;ZAP_INSTALL_PATH"
          "OUTPUTS"
          ${ARGN}
     )
@@ -188,21 +191,39 @@ function(chip_zapgen TARGET_NAME)
         # (slower), however this is currently done because on Darwin zap startup
         # may conflict and error out with:
         #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
-        add_custom_command(
-            OUTPUT ${OUT_NAMES}
-            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/tools/zap/generate.py"
-            ARGS
-                "--no-prettify-output"
-                "--templates" "${TEMPLATE_PATH}"
-                "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
-                "--lock-file" "${CMAKE_BINARY_DIR}/zap_gen.lock"
-                "--parallel"
-                "${ARG_INPUT}"
-            DEPENDS
-                "${ARG_INPUT}"
-                ${EXTRA_DEPENDENCIES}
-            VERBATIM
-        )
+        if(ARG_ZAP_INSTALL_PATH)
+            add_custom_command(
+                OUTPUT ${OUT_NAMES}
+                COMMAND ${CMAKE_COMMAND} -E env "ZAP_INSTALL_PATH=${ARG_ZAP_INSTALL_PATH}" "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/tools/zap/generate.py"
+                ARGS
+                    "--no-prettify-output"
+                    "--templates" "${TEMPLATE_PATH}"
+                    "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
+                    "--lock-file" "${CMAKE_BINARY_DIR}/zap_gen.lock"
+                    "--parallel"
+                    "${ARG_INPUT}"
+                DEPENDS
+                    "${ARG_INPUT}"
+                    ${EXTRA_DEPENDENCIES}
+                VERBATIM
+            )
+        else()
+            add_custom_command(
+                OUTPUT ${OUT_NAMES}
+                COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/tools/zap/generate.py"
+                ARGS
+                    "--no-prettify-output"
+                    "--templates" "${TEMPLATE_PATH}"
+                    "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
+                    "--lock-file" "${CMAKE_BINARY_DIR}/zap_gen.lock"
+                    "--parallel"
+                    "${ARG_INPUT}"
+                DEPENDS
+                    "${ARG_INPUT}"
+                    ${EXTRA_DEPENDENCIES}
+                VERBATIM
+            )
+        endif()
 
         add_custom_target(${TARGET_NAME} DEPENDS "${OUT_NAMES}")
 

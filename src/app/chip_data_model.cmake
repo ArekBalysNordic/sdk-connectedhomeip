@@ -84,6 +84,12 @@ function(chip_configure_data_model APP_TARGET)
         set(SCOPE ${ARG_SCOPE})
     endif()
 
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E env WEST_COMMAND=zap-install west zap-install --get_path
+        OUTPUT_VARIABLE zap_cli_path
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+
     # CMAKE data model auto-includes the server side implementation
     target_sources(${APP_TARGET} ${SCOPE}
         ${CHIP_APP_BASE_DIR}/SafeAttributePersistenceProvider.cpp
@@ -139,13 +145,16 @@ function(chip_configure_data_model APP_TARGET)
             "zap-generated/IMClusterCommandHandler.cpp"
             OUTPUT_PATH APP_TEMPLATES_GEN_DIR
             OUTPUT_FILES APP_TEMPLATES_GEN_FILES
+            ZAP_INSTALL_PATH "${zap_cli_path}"
         )
         target_include_directories(${APP_TARGET} ${SCOPE} "${APP_TEMPLATES_GEN_DIR}")
         target_include_directories(${APP_TARGET} ${SCOPE} "${CHIP_APP_BASE_DIR}/zzz_generated")
+        target_include_directories(${APP_TARGET} ${SCOPE} "${CHIP_APP_ZAP_DIR}")
         add_dependencies(${APP_TARGET} ${APP_TARGET}-zapgen)
     else ()
         target_compile_definitions(${APP_TARGET} PRIVATE CHIP_BYPASS_IDL)
         target_include_directories(${APP_TARGET} ${SCOPE} ${ARG_GEN_DIR})
+        target_include_directories(${APP_TARGET} ${SCOPE} "${CHIP_APP_ZAP_DIR}")
         set(APP_GEN_FILES
             ${ARG_GEN_DIR}/callback-stub.cpp
             ${ARG_GEN_DIR}/IMClusterCommandHandler.cpp

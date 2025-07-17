@@ -28,8 +28,14 @@ class ZapInstall(WestCommand):
                                          description=self.description)
         parser.add_argument('-m', '--matter-path', type=existing_dir_path,
                             default=DEFAULT_MATTER_PATH, help=f'Path to Matter SDK. Default is set to {DEFAULT_MATTER_PATH}')
+        parser.add_argument('--get_path', action='store_true', help='Get zap-cli path')
         return parser
 
     def do_run(self, args, unknown_args):
         zap_installer = ZapInstaller(args.matter_path)
+
+        if args.get_path:
+            print(str(zap_installer.get_zap_cli_path().parent.absolute()))
+            exit(0)
+
         zap_installer.update_zap_if_needed()

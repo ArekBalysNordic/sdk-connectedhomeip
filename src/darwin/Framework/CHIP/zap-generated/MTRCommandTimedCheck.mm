@@ -1310,6 +1310,15 @@ static BOOL CommandNeedsTimedInvokeInCommodityMeteringCluster(AttributeId aAttri
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInNordicDevKitCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::NordicDevKit;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -1742,6 +1751,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::CommodityMetering::Id: {
         return CommandNeedsTimedInvokeInCommodityMeteringCluster(commandID);
+    }
+    case Clusters::NordicDevKit::Id: {
+        return CommandNeedsTimedInvokeInNordicDevKitCluster(commandID);
     }
     case Clusters::UnitTesting::Id: {
         return CommandNeedsTimedInvokeInUnitTestingCluster(commandID);

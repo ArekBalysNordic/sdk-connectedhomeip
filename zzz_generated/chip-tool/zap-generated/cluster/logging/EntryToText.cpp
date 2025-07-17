@@ -299,6 +299,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "MeterIdentification";
     case chip::app::Clusters::CommodityMetering::Id:
         return "CommodityMetering";
+    case chip::app::Clusters::NordicDevKit::Id:
+        return "NordicDevKit";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -594,6 +596,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpecificationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::MaxPathsPerInvoke::Id:
             return "MaxPathsPerInvoke";
+        case chip::app::Clusters::BasicInformation::Attributes::RandomNumber::Id:
+            return "RandomNumber";
         case chip::app::Clusters::BasicInformation::Attributes::ConfigurationVersion::Id:
             return "ConfigurationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::GeneratedCommandList::Id:
@@ -4771,6 +4775,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::NordicDevKit::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NordicDevKit::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::NordicDevKit::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::NordicDevKit::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::NordicDevKit::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::NordicDevKit::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        case chip::app::Clusters::NordicDevKit::Attributes::DevKitName::Id:
+            return "DevKitName";
+        case chip::app::Clusters::NordicDevKit::Attributes::UserLED::Id:
+            return "UserLED";
+        case chip::app::Clusters::NordicDevKit::Attributes::UserButton::Id:
+            return "UserButton";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::UnitTesting::Id: {
         switch (id)
         {
@@ -5128,6 +5155,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
     case chip::app::Clusters::BasicInformation::Id: {
         switch (id)
         {
+        case chip::app::Clusters::BasicInformation::Commands::GenerateRandom::Id:
+            return "GenerateRandom";
         case chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::Id:
             return "MfgSpecificPing";
         default:
@@ -6316,6 +6345,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::NordicDevKit::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NordicDevKit::Commands::SetLED::Id:
+            return "SetLED";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::UnitTesting::Id: {
         switch (id)
         {
@@ -7009,6 +7047,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
 {
     switch (id)
     {
+    case 0x00000001:
+        return "Nordic Development Kit";
     case 0x0000000A:
         return "Door Lock";
     case 0x0000000B:

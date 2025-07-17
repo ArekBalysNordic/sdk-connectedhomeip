@@ -104,6 +104,10 @@ namespace MaxPathsPerInvoke {
 inline constexpr AttributeId Id = 0x00000016;
 } // namespace MaxPathsPerInvoke
 
+namespace RandomNumber {
+inline constexpr AttributeId Id = 0x00000017;
+} // namespace RandomNumber
+
 namespace ConfigurationVersion {
 inline constexpr AttributeId Id = 0x00000018;
 } // namespace ConfigurationVersion

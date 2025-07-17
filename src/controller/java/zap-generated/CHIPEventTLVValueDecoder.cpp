@@ -834,6 +834,36 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        case Events::RandomNumberChanged::Id: {
+            Events::RandomNumberChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass randomNumberChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$BasicInformationClusterRandomNumberChangedEvent",
+                randomNumberChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BasicInformationClusterRandomNumberChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID randomNumberChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, randomNumberChangedStructClass, "<init>", "()V",
+                                                                &randomNumberChangedStructCtor);
+            if (err != CHIP_NO_ERROR || randomNumberChangedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$BasicInformationClusterRandomNumberChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(randomNumberChangedStructClass, randomNumberChangedStructCtor);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
@@ -9008,6 +9038,46 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::CommodityMetering;
         switch (aPath.mEventId)
         {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::NordicDevKit::Id: {
+        using namespace app::Clusters::NordicDevKit;
+        switch (aPath.mEventId)
+        {
+        case Events::UserButtonChanged::Id: {
+            Events::UserButtonChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass userButtonChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$NordicDevKitClusterUserButtonChangedEvent",
+                userButtonChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$NordicDevKitClusterUserButtonChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID userButtonChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, userButtonChangedStructClass, "<init>", "()V",
+                                                                &userButtonChangedStructCtor);
+            if (err != CHIP_NO_ERROR || userButtonChangedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$NordicDevKitClusterUserButtonChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(userButtonChangedStructClass, userButtonChangedStructCtor);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

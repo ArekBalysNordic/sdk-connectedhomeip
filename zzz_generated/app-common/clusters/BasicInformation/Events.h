@@ -170,6 +170,34 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace ReachableChanged
+namespace RandomNumberChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RandomNumberChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RandomNumberChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace RandomNumberChanged
 } // namespace Events
 } // namespace BasicInformation
 } // namespace Clusters

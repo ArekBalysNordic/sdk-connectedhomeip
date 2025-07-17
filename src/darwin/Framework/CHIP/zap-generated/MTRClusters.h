@@ -499,6 +499,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRClusterBasicInformation : MTRGenericCluster
 
+- (void)generateRandomWithParams:(MTRBasicInformationClusterGenerateRandomParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)generateRandomWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeDataModelRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -550,6 +554,10 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSpecificationVersionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxPathsPerInvokeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRandomNumberWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeRandomNumberWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeRandomNumberWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeConfigurationVersionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
@@ -7651,6 +7659,50 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * The queue is currently unused, but may be used in the future for calling completions
  * for command invocations if commands are added to this cluster.
+ */
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
+
+/**
+ * Cluster NordicDevKit
+ *    The NordicDevKit cluster showcases a cluster manufacturer extensions
+ */
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRClusterNordicDevKit : MTRGenericCluster
+
+- (void)setLEDWithParams:(MTRNordicDevKitClusterSetLEDParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDevKitNameWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeDevKitNameWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeDevKitNameWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUserLEDWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUserButtonWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRClusterNordicDevKit (Availability)
+
+/**
+ * For all instance methods that take a completion (i.e. command invocations),
+ * the completion will be called on the provided queue.
  */
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID

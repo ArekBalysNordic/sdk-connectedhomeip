@@ -660,6 +660,34 @@ public static class BasicInformationClusterReachableChangedEvent {
     return output.toString();
   }
 }
+public static class BasicInformationClusterRandomNumberChangedEvent {
+
+  public BasicInformationClusterRandomNumberChangedEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static BasicInformationClusterRandomNumberChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new BasicInformationClusterRandomNumberChangedEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BasicInformationClusterRandomNumberChangedEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
   public Integer previousState;
   public Integer newState;
@@ -6640,6 +6668,34 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
     output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class NordicDevKitClusterUserButtonChangedEvent {
+
+  public NordicDevKitClusterUserButtonChangedEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static NordicDevKitClusterUserButtonChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new NordicDevKitClusterUserButtonChangedEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("NordicDevKitClusterUserButtonChangedEvent {\n");
     output.append("}\n");
     return output.toString();
   }

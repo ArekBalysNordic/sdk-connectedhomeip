@@ -111,6 +111,10 @@ namespace MaxPathsPerInvoke {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPathsPerInvoke::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaxPathsPerInvoke
+namespace RandomNumber {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(RandomNumber::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
+} // namespace RandomNumber
 namespace ConfigurationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -119,6 +123,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::
 } // namespace Attributes
 
 namespace Commands {
+namespace GenerateRandom {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GenerateRandom::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
+} // namespace GenerateRandom
 namespace MfgSpecificPing {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MfgSpecificPing::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

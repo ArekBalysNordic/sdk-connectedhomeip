@@ -97,6 +97,7 @@
 #include <clusters/ModeSelect/EventIds.h>
 #include <clusters/NetworkCommissioning/EventIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/EventIds.h>
+#include <clusters/NordicDevKit/EventIds.h>
 #include <clusters/OccupancySensing/EventIds.h>
 #include <clusters/OnOff/EventIds.h>
 #include <clusters/OperationalCredentials/EventIds.h>

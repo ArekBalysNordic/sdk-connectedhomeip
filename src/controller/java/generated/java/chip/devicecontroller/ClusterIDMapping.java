@@ -439,6 +439,9 @@ public class ClusterIDMapping {
         if (clusterId == CommodityMetering.ID) {
             return new CommodityMetering();
         }
+        if (clusterId == NordicDevKit.ID) {
+            return new NordicDevKit();
+        }
         if (clusterId == UnitTesting.ID) {
             return new UnitTesting();
         }
@@ -1977,6 +1980,7 @@ public class ClusterIDMapping {
             ProductAppearance(20L),
             SpecificationVersion(21L),
             MaxPathsPerInvoke(22L),
+            RandomNumber(23L),
             ConfigurationVersion(24L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
@@ -2006,7 +2010,8 @@ public class ClusterIDMapping {
             StartUp(0L),
             ShutDown(1L),
             Leave(2L),
-            ReachableChanged(3L),;
+            ReachableChanged(3L),
+            RandomNumberChanged(4L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -2027,6 +2032,7 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
+            GenerateRandom(0L),
             MfgSpecificPing(0L),;
             private final long id;
             Command(long id) {
@@ -20328,6 +20334,127 @@ public class ClusterIDMapping {
                 throw new NoSuchFieldError();
             }
         }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class NordicDevKit implements BaseCluster {
+        public static final long ID = 4294048769L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),
+            DevKitName(4293984256L),
+            UserLED(4293984257L),
+            UserButton(4293984258L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            UserButtonChanged(4293984256L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            SetLED(4293984256L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum SetLEDCommandField {Action(0),;
+                    private final int id;
+                    SetLEDCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetLEDCommandField value(int id) throws NoSuchFieldError {
+                        for (SetLEDCommandField field : SetLEDCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

@@ -175,6 +175,7 @@ __all__ = [
     "TlsClientManagement",
     "MeterIdentification",
     "CommodityMetering",
+    "NordicDevKit",
     "UnitTesting",
     "FaultInjection",
     "SampleMei",
@@ -3657,6 +3658,7 @@ class BasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="productAppearance", Tag=0x00000014, Type=typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]),
                 ClusterObjectFieldDescriptor(Label="specificationVersion", Tag=0x00000015, Type=uint),
                 ClusterObjectFieldDescriptor(Label="maxPathsPerInvoke", Tag=0x00000016, Type=uint),
+                ClusterObjectFieldDescriptor(Label="randomNumber", Tag=0x00000017, Type=uint),
                 ClusterObjectFieldDescriptor(Label="configurationVersion", Tag=0x00000018, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -3688,6 +3690,7 @@ class BasicInformation(Cluster):
     productAppearance: typing.Optional[BasicInformation.Structs.ProductAppearanceStruct] = None
     specificationVersion: uint = 0
     maxPathsPerInvoke: uint = 0
+    randomNumber: uint = 0
     configurationVersion: uint = 0
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -3769,6 +3772,19 @@ class BasicInformation(Cluster):
         class MfgSpecificPing(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000028
             command_id: typing.ClassVar[int] = 0x10020000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class GenerateRandom(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000028
+            command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -4148,6 +4164,22 @@ class BasicInformation(Cluster):
             value: uint = 0
 
         @dataclass
+        class RandomNumber(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000028
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000017
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
         class ConfigurationVersion(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -4316,6 +4348,22 @@ class BasicInformation(Cluster):
                     ])
 
             reachableNewValue: bool = False
+
+        @dataclass
+        class RandomNumberChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000028
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
 
 
 @dataclass
@@ -52715,6 +52763,208 @@ class CommodityMetering(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+
+@dataclass
+class NordicDevKit(Cluster):
+    id: typing.ClassVar[int] = 0xFFF1FC01
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+                ClusterObjectFieldDescriptor(Label="devKitName", Tag=0xFFF10000, Type=str),
+                ClusterObjectFieldDescriptor(Label="userLED", Tag=0xFFF10001, Type=bool),
+                ClusterObjectFieldDescriptor(Label="userButton", Tag=0xFFF10002, Type=bool),
+            ])
+
+    generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    attributeList: typing.List[uint] = field(default_factory=lambda: [])
+    featureMap: uint = 0
+    clusterRevision: uint = 0
+    devKitName: str = ""
+    userLED: bool = False
+    userButton: bool = False
+
+    class Enums:
+        class LEDActionEnum(MatterIntEnum):
+            kOff = 0x00
+            kOn = 0x01
+            kToggle = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+    class Commands:
+        @dataclass
+        class SetLED(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC01
+            command_id: typing.ClassVar[int] = 0xFFF10000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="action", Tag=0, Type=NordicDevKit.Enums.LEDActionEnum),
+                    ])
+
+            action: NordicDevKit.Enums.LEDActionEnum = 0
+
+    class Attributes:
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC01
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC01
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC01
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC01
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC01
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class DevKitName(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC01
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFF10000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=str)
+
+            value: str = ""
+
+        @dataclass
+        class UserLED(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC01
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFF10001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=bool)
+
+            value: bool = False
+
+        @dataclass
+        class UserButton(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC01
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFF10002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=bool)
+
+            value: bool = False
+
+    class Events:
+        @dataclass
+        class UserButtonChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC01
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0xFFF10000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
 
 
 @dataclass

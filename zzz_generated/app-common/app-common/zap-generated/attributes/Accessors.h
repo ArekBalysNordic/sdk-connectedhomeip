@@ -382,6 +382,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace Reachable
 
+namespace RandomNumber {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace RandomNumber
+
 namespace ConfigurationVersion {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // int32u
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
@@ -5935,6 +5941,42 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 } // namespace Attributes
 } // namespace CommodityMetering
+
+namespace NordicDevKit {
+namespace Attributes {
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+namespace DevKitName {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+} // namespace DevKitName
+
+namespace UserLED {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace UserLED
+
+namespace UserButton {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace UserButton
+
+} // namespace Attributes
+} // namespace NordicDevKit
 
 namespace UnitTesting {
 namespace Attributes {

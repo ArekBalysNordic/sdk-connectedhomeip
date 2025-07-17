@@ -7658,6 +7658,34 @@ public:
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
+- (void)generateRandomWithCompletion:(MTRStatusCompletion)completion
+{
+    [self generateRandomWithParams:nil completion:completion];
+}
+- (void)generateRandomWithParams:(MTRBasicInformationClusterGenerateRandomParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRBasicInformationClusterGenerateRandomParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = BasicInformation::Commands::GenerateRandom::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
 
 - (void)readAttributeDataModelRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
@@ -8563,6 +8591,70 @@ public:
 + (void)readAttributeMaxPathsPerInvokeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = BasicInformation::Attributes::MaxPathsPerInvoke::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeRandomNumberWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = BasicInformation::Attributes::RandomNumber::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)writeAttributeRandomNumberWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    [self writeAttributeRandomNumberWithValue:(NSNumber * _Nonnull) value params:nil completion:completion];
+}
+- (void)writeAttributeRandomNumberWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    // Make a copy of params before we go async.
+    params = [params copy];
+    value = [value copy];
+
+    auto * bridge = new MTRDefaultSuccessCallbackBridge(self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+        chip::Optional<uint16_t> timedWriteTimeout;
+        if (params != nil) {
+          if (params.timedWriteTimeout != nil){
+            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
+          }
+        }
+
+        ListFreer listFreer;
+        using TypeInfo = BasicInformation::Attributes::RandomNumber::TypeInfo;
+        TypeInfo::Type cppValue;
+          cppValue = value.unsignedShortValue;
+
+        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
+        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
+    std::move(*bridge).DispatchAction(self.device);
+}
+
+- (void)subscribeAttributeRandomNumberWithParams:(MTRSubscribeParams * _Nonnull)params
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = BasicInformation::Attributes::RandomNumber::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeRandomNumberWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = BasicInformation::Attributes::RandomNumber::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -108372,6 +108464,301 @@ public:
                                     attributeID:TypeInfo::GetAttributeId()
                                           queue:queue
                                      completion:completion];
+}
+
+@end
+
+@implementation MTRBaseClusterNordicDevKit
+
+- (void)setLEDWithParams:(MTRNordicDevKitClusterSetLEDParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRNordicDevKitClusterSetLEDParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = NordicDevKit::Commands::SetLED::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = NordicDevKit::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::GeneratedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = NordicDevKit::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::AcceptedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::AttributeList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams * _Nonnull)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = NordicDevKit::Attributes::AttributeList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::AttributeList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::FeatureMap::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams * _Nonnull)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = NordicDevKit::Attributes::FeatureMap::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::FeatureMap::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::ClusterRevision::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams * _Nonnull)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = NordicDevKit::Attributes::ClusterRevision::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::ClusterRevision::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeDevKitNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::DevKitName::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)writeAttributeDevKitNameWithValue:(NSString * _Nonnull)value completion:(MTRStatusCompletion)completion
+{
+    [self writeAttributeDevKitNameWithValue:(NSString * _Nonnull) value params:nil completion:completion];
+}
+- (void)writeAttributeDevKitNameWithValue:(NSString * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    // Make a copy of params before we go async.
+    params = [params copy];
+    value = [value copy];
+
+    auto * bridge = new MTRDefaultSuccessCallbackBridge(self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+        chip::Optional<uint16_t> timedWriteTimeout;
+        if (params != nil) {
+          if (params.timedWriteTimeout != nil){
+            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
+          }
+        }
+
+        ListFreer listFreer;
+        using TypeInfo = NordicDevKit::Attributes::DevKitName::TypeInfo;
+        TypeInfo::Type cppValue;
+          cppValue = AsCharSpan(value);
+
+        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
+        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
+    std::move(*bridge).DispatchAction(self.device);
+}
+
+- (void)subscribeAttributeDevKitNameWithParams:(MTRSubscribeParams * _Nonnull)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = NordicDevKit::Attributes::DevKitName::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeDevKitNameWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::DevKitName::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeUserLEDWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::UserLED::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)readAttributeUserButtonWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = NordicDevKit::Attributes::UserButton::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
 }
 
 @end

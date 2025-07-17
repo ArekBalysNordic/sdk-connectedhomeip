@@ -916,6 +916,12 @@ class ChipClusters:
         "clusterName": "BasicInformation",
         "clusterId": 0x00000028,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "GenerateRandom",
+                "args": {
+                },
+            },
             0x10020000: {
                 "commandId": 0x10020000,
                 "commandName": "MfgSpecificPing",
@@ -1064,6 +1070,13 @@ class ChipClusters:
                 "attributeId": 0x00000016,
                 "type": "int",
                 "reportable": True,
+            },
+            0x00000017: {
+                "attributeName": "RandomNumber",
+                "attributeId": 0x00000017,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
             },
             0x00000018: {
                 "attributeName": "ConfigurationVersion",
@@ -14541,6 +14554,68 @@ class ChipClusters:
             },
         },
     }
+    _NORDIC_DEV_KIT_CLUSTER_INFO = {
+        "clusterName": "NordicDevKit",
+        "clusterId": 0xFFF1FC01,
+        "commands": {
+            0xFFF10000: {
+                "commandId": 0xFFF10000,
+                "commandName": "SetLED",
+                "args": {
+                    "action": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+            0xFFF10000: {
+                "attributeName": "DevKitName",
+                "attributeId": 0xFFF10000,
+                "type": "str",
+                "reportable": True,
+                "writable": True,
+            },
+            0xFFF10001: {
+                "attributeName": "UserLED",
+                "attributeId": 0xFFF10001,
+                "type": "bool",
+            },
+            0xFFF10002: {
+                "attributeName": "UserButton",
+                "attributeId": 0xFFF10002,
+                "type": "bool",
+            },
+        },
+    }
     _UNIT_TESTING_CLUSTER_INFO = {
         "clusterName": "UnitTesting",
         "clusterId": 0xFFF1FC05,
@@ -15673,6 +15748,7 @@ class ChipClusters:
         0x00000802: _TLS_CLIENT_MANAGEMENT_CLUSTER_INFO,
         0x00000B06: _METER_IDENTIFICATION_CLUSTER_INFO,
         0x00000B07: _COMMODITY_METERING_CLUSTER_INFO,
+        0xFFF1FC01: _NORDIC_DEV_KIT_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
         0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
@@ -15816,6 +15892,7 @@ class ChipClusters:
         "TlsClientManagement": _TLS_CLIENT_MANAGEMENT_CLUSTER_INFO,
         "MeterIdentification": _METER_IDENTIFICATION_CLUSTER_INFO,
         "CommodityMetering": _COMMODITY_METERING_CLUSTER_INFO,
+        "NordicDevKit": _NORDIC_DEV_KIT_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
         "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,

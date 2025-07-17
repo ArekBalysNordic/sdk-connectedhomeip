@@ -331,6 +331,10 @@
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Commands.ipp>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Events.ipp>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Structs.ipp>
+#include <clusters/NordicDevKit/Attributes.ipp>
+#include <clusters/NordicDevKit/Commands.ipp>
+#include <clusters/NordicDevKit/Events.ipp>
+#include <clusters/NordicDevKit/Structs.ipp>
 #include <clusters/OccupancySensing/Attributes.ipp>
 #include <clusters/OccupancySensing/Commands.ipp>
 #include <clusters/OccupancySensing/Events.ipp>
@@ -1407,6 +1411,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::TlsClientManagement::Commands::RemoveEndpoint::Id:
             return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::NordicDevKit::Id: {
+        switch (aCommand)
+        {
         default:
             return false;
         }

@@ -99,6 +99,7 @@
 #include <clusters/ModeSelect/EnumsCheck.h>
 #include <clusters/NetworkCommissioning/EnumsCheck.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/EnumsCheck.h>
+#include <clusters/NordicDevKit/EnumsCheck.h>
 #include <clusters/OccupancySensing/EnumsCheck.h>
 #include <clusters/OnOff/EnumsCheck.h>
 #include <clusters/OperationalCredentials/EnumsCheck.h>

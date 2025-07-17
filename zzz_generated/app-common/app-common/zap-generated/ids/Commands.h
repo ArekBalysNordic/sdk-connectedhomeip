@@ -97,6 +97,7 @@
 #include <clusters/ModeSelect/CommandIds.h>
 #include <clusters/NetworkCommissioning/CommandIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/CommandIds.h>
+#include <clusters/NordicDevKit/CommandIds.h>
 #include <clusters/OccupancySensing/CommandIds.h>
 #include <clusters/OnOff/CommandIds.h>
 #include <clusters/OperationalCredentials/CommandIds.h>

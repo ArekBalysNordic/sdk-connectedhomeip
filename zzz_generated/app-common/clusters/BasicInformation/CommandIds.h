@@ -11,6 +11,10 @@ namespace app {
 namespace Clusters {
 namespace BasicInformation {
 namespace Commands {
+namespace GenerateRandom {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace GenerateRandom
+
 namespace MfgSpecificPing {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace MfgSpecificPing

@@ -268,6 +268,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRBasicInformationClusterGenerateRandomParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTROTASoftwareUpdateProviderClusterQueryImageParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2675,6 +2681,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRTLSClientManagementClusterRemoveEndpointParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNordicDevKitClusterSetLEDParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

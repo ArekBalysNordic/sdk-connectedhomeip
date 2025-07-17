@@ -353,6 +353,28 @@ public class ClusterWriteMapping {
       writeBasicInformationLocalConfigDisabledCommandParams
     );
     writeBasicInformationInteractionInfo.put("writeLocalConfigDisabledAttribute", writeBasicInformationLocalConfigDisabledAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBasicInformationRandomNumberCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo basicInformationrandomNumberCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeBasicInformationRandomNumberCommandParams.put(
+        "value",
+        basicInformationrandomNumberCommandParameterInfo
+    );
+    InteractionInfo writeBasicInformationRandomNumberAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.BasicInformationCluster) cluster).writeRandomNumberAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeBasicInformationRandomNumberCommandParams
+    );
+    writeBasicInformationInteractionInfo.put("writeRandomNumberAttribute", writeBasicInformationRandomNumberAttributeInteractionInfo);
     writeAttributeMap.put("basicInformation", writeBasicInformationInteractionInfo);
     Map<String, InteractionInfo> writeOtaSoftwareUpdateProviderInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("otaSoftwareUpdateProvider", writeOtaSoftwareUpdateProviderInteractionInfo);
@@ -3622,6 +3644,30 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("meterIdentification", writeMeterIdentificationInteractionInfo);
     Map<String, InteractionInfo> writeCommodityMeteringInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("commodityMetering", writeCommodityMeteringInteractionInfo);
+    Map<String, InteractionInfo> writeNordicDevKitInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeNordicDevKitDevKitNameCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo nordicDevKitdevKitNameCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            String.class, 
+            String.class 
+        );
+    writeNordicDevKitDevKitNameCommandParams.put(
+        "value",
+        nordicDevKitdevKitNameCommandParameterInfo
+    );
+    InteractionInfo writeNordicDevKitDevKitNameAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.NordicDevKitCluster) cluster).writeDevKitNameAttribute(
+          (DefaultClusterCallback) callback,
+          (String) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeNordicDevKitDevKitNameCommandParams
+    );
+    writeNordicDevKitInteractionInfo.put("writeDevKitNameAttribute", writeNordicDevKitDevKitNameAttributeInteractionInfo);
+    writeAttributeMap.put("nordicDevKit", writeNordicDevKitInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingbooleanCommandParameterInfo =

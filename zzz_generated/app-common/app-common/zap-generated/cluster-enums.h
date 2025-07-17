@@ -99,6 +99,7 @@
 #include <clusters/ModeSelect/Enums.h>
 #include <clusters/NetworkCommissioning/Enums.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Enums.h>
+#include <clusters/NordicDevKit/Enums.h>
 #include <clusters/OccupancySensing/Enums.h>
 #include <clusters/OnOff/Enums.h>
 #include <clusters/OperationalCredentials/Enums.h>

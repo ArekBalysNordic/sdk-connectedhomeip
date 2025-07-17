@@ -97,6 +97,7 @@
 #include <clusters/ModeSelect/AttributeIds.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/AttributeIds.h>
+#include <clusters/NordicDevKit/AttributeIds.h>
 #include <clusters/OccupancySensing/AttributeIds.h>
 #include <clusters/OnOff/AttributeIds.h>
 #include <clusters/OperationalCredentials/AttributeIds.h>

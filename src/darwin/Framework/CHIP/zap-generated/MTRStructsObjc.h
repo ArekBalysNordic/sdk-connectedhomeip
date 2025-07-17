@@ -323,6 +323,10 @@ MTR_DEPRECATED("Please use MTRBasicInformationClusterReachableChangedEvent", ios
 @property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue MTR_DEPRECATED("Please use MTRBasicInformationClusterReachableChangedEvent", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBasicInformationClusterRandomNumberChangedEvent : NSObject <NSCopying>
+@end
+
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTROTASoftwareUpdateRequestorClusterProviderLocation : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull providerNodeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -2700,6 +2704,10 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRCommodityMeteringClusterMeteredQuantityStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull tariffComponentIDs MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull quantity MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRNordicDevKitClusterUserButtonChangedEvent : NSObject <NSCopying>
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))

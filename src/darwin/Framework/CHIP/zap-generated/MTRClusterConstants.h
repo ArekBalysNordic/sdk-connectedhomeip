@@ -217,6 +217,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeTLSClientManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000802,
     MTRClusterIDTypeMeterIdentificationID MTR_PROVISIONALLY_AVAILABLE = 0x00000B06,
     MTRClusterIDTypeCommodityMeteringID MTR_PROVISIONALLY_AVAILABLE = 0x00000B07,
+    MTRClusterIDTypeNordicDevKitID MTR_PROVISIONALLY_AVAILABLE = 0xFFF1FC01,
     MTRClusterIDTypeUnitTestingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0xFFF1FC05,
     MTRClusterIDTypeSampleMEIID MTR_PROVISIONALLY_AVAILABLE = 0xFFF1FC20,
 
@@ -721,6 +722,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBasicInformationAttributeProductAppearanceID MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x00000014,
     MTRAttributeIDTypeClusterBasicInformationAttributeSpecificationVersionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000015,
     MTRAttributeIDTypeClusterBasicInformationAttributeMaxPathsPerInvokeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000016,
+    MTRAttributeIDTypeClusterBasicInformationAttributeRandomNumberID MTR_PROVISIONALLY_AVAILABLE = 0x00000017,
     MTRAttributeIDTypeClusterBasicInformationAttributeConfigurationVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000018,
     MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterBasicInformationAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
@@ -4908,6 +4910,16 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterCommodityMeteringAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterCommodityMeteringAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster NordicDevKit attributes
+    MTRAttributeIDTypeClusterNordicDevKitAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterNordicDevKitAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterNordicDevKitAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterNordicDevKitAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterNordicDevKitAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    MTRAttributeIDTypeClusterNordicDevKitAttributeDevKitNameID MTR_PROVISIONALLY_AVAILABLE = 0xFFF10000,
+    MTRAttributeIDTypeClusterNordicDevKitAttributeUserLEDID MTR_PROVISIONALLY_AVAILABLE = 0xFFF10001,
+    MTRAttributeIDTypeClusterNordicDevKitAttributeUserButtonID MTR_PROVISIONALLY_AVAILABLE = 0xFFF10002,
+
     // Cluster TestCluster deprecated attribute names
     MTRClusterTestClusterAttributeBooleanID
         MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBooleanID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -6160,6 +6172,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     = 0x10020000,
 
     // Cluster BasicInformation commands
+    MTRCommandIDTypeClusterBasicInformationCommandGenerateRandomID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster OtaSoftwareUpdateProvider deprecated command id names
     MTRClusterOtaSoftwareUpdateProviderCommandQueryImageID
@@ -7218,6 +7231,9 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterTLSClientManagementCommandFindEndpointResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRCommandIDTypeClusterTLSClientManagementCommandRemoveEndpointID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
 
+    // Cluster NordicDevKit commands
+    MTRCommandIDTypeClusterNordicDevKitCommandSetLEDID MTR_PROVISIONALLY_AVAILABLE = 0xFFF10000,
+
     // Cluster TestCluster deprecated command id names
     MTRClusterTestClusterCommandTestID
         MTR_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -7454,6 +7470,7 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterBasicInformationEventShutDownID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
     MTREventIDTypeClusterBasicInformationEventLeaveID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
     MTREventIDTypeClusterBasicInformationEventReachableChangedID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
+    MTREventIDTypeClusterBasicInformationEventRandomNumberChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
 
     // Cluster OtaSoftwareUpdateRequestor deprecated event names
     MTRClusterOtaSoftwareUpdateRequestorEventStateTransitionID
@@ -7815,6 +7832,9 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster CommissionerControl events
     MTREventIDTypeClusterCommissionerControlEventCommissioningRequestResultID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
 
+    // Cluster NordicDevKit events
+    MTREventIDTypeClusterNordicDevKitEventUserButtonChangedID MTR_PROVISIONALLY_AVAILABLE = 0xFFF10000,
+
     // Cluster TestCluster deprecated event names
     MTRClusterTestClusterEventTestEventID
         MTR_DEPRECATED("Please use MTREventIDTypeClusterUnitTestingEventTestEventID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -7836,6 +7856,7 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 #pragma mark - Device Type IDs
 
 typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
+    MTRDeviceTypeIDTypeNordicDevelopmentKitID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRDeviceTypeIDTypeDoorLockID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000000A,
     MTRDeviceTypeIDTypeDoorLockControllerID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000000B,
     MTRDeviceTypeIDTypeAggregatorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000000E,

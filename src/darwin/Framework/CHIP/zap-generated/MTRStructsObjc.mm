@@ -1232,6 +1232,29 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic reachableNewValue;
 @end
 
+@implementation MTRBasicInformationClusterRandomNumberChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRBasicInformationClusterRandomNumberChangedEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROTASoftwareUpdateRequestorClusterProviderLocation
 - (instancetype)init
 {
@@ -11405,6 +11428,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: tariffComponentIDs:%@; quantity:%@; >", NSStringFromClass([self class]), _tariffComponentIDs, _quantity];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNordicDevKitClusterUserButtonChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRNordicDevKitClusterUserButtonChangedEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 

@@ -8529,6 +8529,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const BasicInformation::Events::RandomNumberChanged::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -10800,6 +10808,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const NordicDevKit::Events::UserButtonChanged::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const UnitTesting::Events::TestEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -12596,6 +12612,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxPathsPerInvoke", 1, value);
+        }
+        case BasicInformation::Attributes::RandomNumber::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RandomNumber", 1, value);
         }
         case BasicInformation::Attributes::ConfigurationVersion::Id: {
             uint32_t value;
@@ -21737,6 +21758,52 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case NordicDevKit::Id: {
+        switch (path.mAttributeId)
+        {
+        case NordicDevKit::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, NordicDevKit::Id);
+        }
+        case NordicDevKit::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, NordicDevKit::Id);
+        }
+        case NordicDevKit::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, NordicDevKit::Id);
+        }
+        case NordicDevKit::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case NordicDevKit::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        case NordicDevKit::Attributes::DevKitName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DevKitName", 1, value);
+        }
+        case NordicDevKit::Attributes::UserLED::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UserLED", 1, value);
+        }
+        case NordicDevKit::Attributes::UserButton::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UserButton", 1, value);
+        }
+        }
+        break;
+    }
     case UnitTesting::Id: {
         switch (path.mAttributeId)
         {
@@ -23269,6 +23336,11 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ReachableChanged", 1, value);
         }
+        case BasicInformation::Events::RandomNumberChanged::Id: {
+            chip::app::Clusters::BasicInformation::Events::RandomNumberChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RandomNumberChanged", 1, value);
+        }
         }
         break;
     }
@@ -24055,6 +24127,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::CommissionerControl::Events::CommissioningRequestResult::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CommissioningRequestResult", 1, value);
+        }
+        }
+        break;
+    }
+    case NordicDevKit::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case NordicDevKit::Events::UserButtonChanged::Id: {
+            chip::app::Clusters::NordicDevKit::Events::UserButtonChanged::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UserButtonChanged", 1, value);
         }
         }
         break;

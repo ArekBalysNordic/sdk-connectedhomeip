@@ -40,6 +40,7 @@ CHIP_ROOT_DIR = os.path.realpath(
 
 # TODO: Can we share this constant definition with generate.py?
 DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
+zcl_file = DEFAULT_DATA_MODEL_DESCRIPTION_FILE
 
 
 class TargetType(Flag):
@@ -360,6 +361,8 @@ def checkPythonVersion():
 def setupArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Generate content from ZAP files')
+    parser.add_argument('--zcl', type=str,
+                        help='zcl.json file to use for generation')
     parser.add_argument('--type', action='append', choices=__TARGET_TYPES__.keys(),
                         help='Choose which content type to generate (default: all)')
     parser.add_argument('--dry-run', default=False, action='store_true',
@@ -411,7 +414,7 @@ def getGlobalTemplatesTargets():
 
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE),
+    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson(zcl_file),
                    client_side=True, matter_file_name="src/controller/data_model/controller-clusters.matter"))
 
     return targets
@@ -448,7 +451,7 @@ def getGoldenTestImageTargets():
 
 
 def getSpecificTemplatesTargets():
-    zap_input = ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE)
+    zap_input = ZapInput.FromPropertiesJson(zcl_file)
 
     # Mapping of required template and output directory
     templates = {
@@ -543,6 +546,8 @@ def main():
     checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()
+    global zcl_file
+    zcl_file = args.zcl
 
     targets = getTargets(args.type)
 

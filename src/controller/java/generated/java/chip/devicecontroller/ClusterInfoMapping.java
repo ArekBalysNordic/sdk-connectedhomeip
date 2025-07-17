@@ -20857,6 +20857,69 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedNordicDevKitClusterGeneratedCommandListAttributeCallback implements ChipClusters.NordicDevKitCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedNordicDevKitClusterAcceptedCommandListAttributeCallback implements ChipClusters.NordicDevKitCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedNordicDevKitClusterAttributeListAttributeCallback implements ChipClusters.NordicDevKitCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
 
   public static class DelegatedUnitTestingClusterTestSpecificResponseCallback implements ChipClusters.UnitTestingCluster.TestSpecificResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -22970,6 +23033,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.CommodityMeteringCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("commodityMetering", commodityMeteringClusterInfo);
 
+    ClusterInfo nordicDevKitClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.NordicDevKitCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("nordicDevKit", nordicDevKitClusterInfo);
+
     ClusterInfo unitTestingClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.UnitTestingCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("unitTesting", unitTestingClusterInfo);
@@ -23123,6 +23190,7 @@ public class ClusterInfoMapping {
     destination.get("tlsClientManagement").combineCommands(source.get("tlsClientManagement"));
     destination.get("meterIdentification").combineCommands(source.get("meterIdentification"));
     destination.get("commodityMetering").combineCommands(source.get("commodityMetering"));
+    destination.get("nordicDevKit").combineCommands(source.get("nordicDevKit"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
     destination.get("faultInjection").combineCommands(source.get("faultInjection"));
     destination.get("sampleMei").combineCommands(source.get("sampleMei"));
@@ -23985,6 +24053,18 @@ public class ClusterInfoMapping {
     commandMap.put("actions", actionsClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> basicInformationClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> basicInformationgenerateRandomCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo basicInformationgenerateRandomInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.BasicInformationCluster) cluster)
+        .generateRandom((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        basicInformationgenerateRandomCommandParams
+    );
+    basicInformationClusterInteractionInfoMap.put("generateRandom", basicInformationgenerateRandomInteractionInfo);
 
     Map<String, CommandParameterInfo> basicInformationmfgSpecificPingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo basicInformationmfgSpecificPingInteractionInfo = new InteractionInfo(
@@ -31340,6 +31420,27 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> commodityMeteringClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("commodityMetering", commodityMeteringClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> nordicDevKitClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> nordicDevKitsetLEDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo nordicDevKitsetLEDactionCommandParameterInfo = new CommandParameterInfo("action", Integer.class, Integer.class);
+    nordicDevKitsetLEDCommandParams.put("action",nordicDevKitsetLEDactionCommandParameterInfo);
+    InteractionInfo nordicDevKitsetLEDInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.NordicDevKitCluster) cluster)
+        .setLED((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("action")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        nordicDevKitsetLEDCommandParams
+    );
+    nordicDevKitClusterInteractionInfoMap.put("setLED", nordicDevKitsetLEDInteractionInfo);
+
+    commandMap.put("nordicDevKit", nordicDevKitClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> unitTestingClusterInteractionInfoMap = new LinkedHashMap<>();
 

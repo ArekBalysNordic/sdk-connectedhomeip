@@ -331,6 +331,10 @@
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Commands.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Events.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/Structs.h>
+#include <clusters/NordicDevKit/Attributes.h>
+#include <clusters/NordicDevKit/Commands.h>
+#include <clusters/NordicDevKit/Events.h>
+#include <clusters/NordicDevKit/Structs.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Commands.h>
 #include <clusters/OccupancySensing/Events.h>

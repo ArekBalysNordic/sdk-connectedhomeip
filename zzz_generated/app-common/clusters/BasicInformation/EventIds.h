@@ -27,6 +27,10 @@ namespace ReachableChanged {
 inline constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 
+namespace RandomNumberChanged {
+inline constexpr EventId Id = 0x00000004;
+} // namespace RandomNumberChanged
+
 } // namespace Events
 } // namespace BasicInformation
 } // namespace Clusters

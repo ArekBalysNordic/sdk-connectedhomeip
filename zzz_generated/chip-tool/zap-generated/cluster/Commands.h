@@ -172,6 +172,7 @@
 | TlsClientManagement                                                 | 0x0802 |
 | MeterIdentification                                                 | 0x0B06 |
 | CommodityMetering                                                   | 0x0B07 |
+| NordicDevKit                                                        | 0xFFF1FC01|
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
 | SampleMei                                                           | 0xFFF1FC20|
@@ -1783,6 +1784,7 @@ private:
 | Cluster BasicInformation                                            | 0x0028 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * GenerateRandom                                                    |   0x00 |
 | * MfgSpecificPing                                                   |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -1809,6 +1811,7 @@ private:
 | * ProductAppearance                                                 | 0x0014 |
 | * SpecificationVersion                                              | 0x0015 |
 | * MaxPathsPerInvoke                                                 | 0x0016 |
+| * RandomNumber                                                      | 0x0017 |
 | * ConfigurationVersion                                              | 0x0018 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -1821,7 +1824,45 @@ private:
 | * ShutDown                                                          | 0x0001 |
 | * Leave                                                             | 0x0002 |
 | * ReachableChanged                                                  | 0x0003 |
+| * RandomNumberChanged                                               | 0x0004 |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command GenerateRandom
+ */
+class BasicInformationGenerateRandom : public ClusterCommand
+{
+public:
+    BasicInformationGenerateRandom(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("generate-random", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BasicInformation::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BasicInformation::Commands::GenerateRandom::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BasicInformation::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BasicInformation::Commands::GenerateRandom::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::BasicInformation::Commands::GenerateRandom::Type mRequest;
+};
 
 /*
  * Command MfgSpecificPing
@@ -17338,6 +17379,63 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
+| Cluster NordicDevKit                                                | 0xFFF1FC01 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * SetLED                                                            |   0xFFF10000|
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+| * DevKitName                                                        | 0xFFF10000|
+| * UserLED                                                           | 0xFFF10001|
+| * UserButton                                                        | 0xFFF10002|
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * UserButtonChanged                                                 | 0xFFF10000|
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command SetLED
+ */
+class NordicDevKitSetLED : public ClusterCommand
+{
+public:
+    NordicDevKitSetLED(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-led", credsIssuerConfig)
+    {
+        AddArgument("Action", 0, UINT8_MAX, &mRequest.action);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NordicDevKit::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NordicDevKit::Commands::SetLED::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NordicDevKit::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NordicDevKit::Commands::SetLED::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::NordicDevKit::Commands::SetLED::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster UnitTesting                                                 | 0xFFF1FC05 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -19445,6 +19543,7 @@ void registerClusterBasicInformation(Commands & commands, CredentialIssuerComman
         // Commands
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig),              //
+        make_unique<BasicInformationGenerateRandom>(credsIssuerConfig),  //
         make_unique<BasicInformationMfgSpecificPing>(credsIssuerConfig), //
         //
         // Attributes
@@ -19473,6 +19572,7 @@ void registerClusterBasicInformation(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "product-appearance", Attributes::ProductAppearance::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "specification-version", Attributes::SpecificationVersion::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "max-paths-per-invoke", Attributes::MaxPathsPerInvoke::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "random-number", Attributes::RandomNumber::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "configuration-version", Attributes::ConfigurationVersion::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
@@ -19526,6 +19626,8 @@ void registerClusterBasicInformation(Commands & commands, CredentialIssuerComman
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "max-paths-per-invoke", 0, UINT16_MAX, Attributes::MaxPathsPerInvoke::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "random-number", 0, UINT16_MAX, Attributes::RandomNumber::Id,
+                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint32_t>>(Id, "configuration-version", 0, UINT32_MAX, Attributes::ConfigurationVersion::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -19563,6 +19665,7 @@ void registerClusterBasicInformation(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "product-appearance", Attributes::ProductAppearance::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "specification-version", Attributes::SpecificationVersion::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "max-paths-per-invoke", Attributes::MaxPathsPerInvoke::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "random-number", Attributes::RandomNumber::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "configuration-version", Attributes::ConfigurationVersion::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
@@ -19572,16 +19675,18 @@ void registerClusterBasicInformation(Commands & commands, CredentialIssuerComman
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                         //
-        make_unique<ReadEvent>(Id, "start-up", Events::StartUp::Id, credsIssuerConfig),                        //
-        make_unique<ReadEvent>(Id, "shut-down", Events::ShutDown::Id, credsIssuerConfig),                      //
-        make_unique<ReadEvent>(Id, "leave", Events::Leave::Id, credsIssuerConfig),                             //
-        make_unique<ReadEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                    //
-        make_unique<SubscribeEvent>(Id, "start-up", Events::StartUp::Id, credsIssuerConfig),                   //
-        make_unique<SubscribeEvent>(Id, "shut-down", Events::ShutDown::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeEvent>(Id, "leave", Events::Leave::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                //
+        make_unique<ReadEvent>(Id, "start-up", Events::StartUp::Id, credsIssuerConfig),                               //
+        make_unique<ReadEvent>(Id, "shut-down", Events::ShutDown::Id, credsIssuerConfig),                             //
+        make_unique<ReadEvent>(Id, "leave", Events::Leave::Id, credsIssuerConfig),                                    //
+        make_unique<ReadEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig),             //
+        make_unique<ReadEvent>(Id, "random-number-changed", Events::RandomNumberChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeEvent>(Id, "start-up", Events::StartUp::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeEvent>(Id, "shut-down", Events::ShutDown::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeEvent>(Id, "leave", Events::Leave::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig),        //
+        make_unique<SubscribeEvent>(Id, "random-number-changed", Events::RandomNumberChanged::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -30975,6 +31080,68 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterNordicDevKit(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::NordicDevKit;
+
+    const char * clusterName = "NordicDevKit";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        make_unique<NordicDevKitSetLED>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "dev-kit-name", Attributes::DevKitName::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "user-led", Attributes::UserLED::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "user-button", Attributes::UserButton::Id, credsIssuerConfig),                      //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::CharSpan>>(Id, "dev-kit-name", Attributes::DevKitName::Id, WriteCommandType::kWrite,
+                                                    credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "user-led", 0, 1, Attributes::UserLED::Id, WriteCommandType::kForceWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "user-button", 0, 1, Attributes::UserButton::Id, WriteCommandType::kForceWrite,
+                                          credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "dev-kit-name", Attributes::DevKitName::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "user-led", Attributes::UserLED::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "user-button", Attributes::UserButton::Id, credsIssuerConfig),                      //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                            //
+        make_unique<ReadEvent>(Id, "user-button-changed", Events::UserButtonChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                       //
+        make_unique<SubscribeEvent>(Id, "user-button-changed", Events::UserButtonChanged::Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::UnitTesting;
@@ -31722,6 +31889,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterTlsClientManagement(commands, credsIssuerConfig);
     registerClusterMeterIdentification(commands, credsIssuerConfig);
     registerClusterCommodityMetering(commands, credsIssuerConfig);
+    registerClusterNordicDevKit(commands, credsIssuerConfig);
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
     registerClusterSampleMei(commands, credsIssuerConfig);

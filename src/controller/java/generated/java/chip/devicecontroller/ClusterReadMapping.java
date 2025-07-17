@@ -1217,6 +1217,17 @@ public class ClusterReadMapping {
           readBasicInformationMaxPathsPerInvokeCommandParams
         );
         result.put("readMaxPathsPerInvokeAttribute", readBasicInformationMaxPathsPerInvokeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBasicInformationRandomNumberCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBasicInformationRandomNumberAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.BasicInformationCluster) cluster).readRandomNumberAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readBasicInformationRandomNumberCommandParams
+        );
+        result.put("readRandomNumberAttribute", readBasicInformationRandomNumberAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readBasicInformationConfigurationVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readBasicInformationConfigurationVersionAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -19262,6 +19273,98 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readNordicDevKitInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readNordicDevKitGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNordicDevKitGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NordicDevKitCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.NordicDevKitCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNordicDevKitClusterGeneratedCommandListAttributeCallback(),
+          readNordicDevKitGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readNordicDevKitGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNordicDevKitAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNordicDevKitAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NordicDevKitCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.NordicDevKitCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNordicDevKitClusterAcceptedCommandListAttributeCallback(),
+          readNordicDevKitAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readNordicDevKitAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNordicDevKitAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNordicDevKitAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NordicDevKitCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.NordicDevKitCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNordicDevKitClusterAttributeListAttributeCallback(),
+          readNordicDevKitAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readNordicDevKitAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNordicDevKitFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNordicDevKitFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NordicDevKitCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readNordicDevKitFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readNordicDevKitFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNordicDevKitClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNordicDevKitClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NordicDevKitCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readNordicDevKitClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readNordicDevKitClusterRevisionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNordicDevKitDevKitNameCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNordicDevKitDevKitNameAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NordicDevKitCluster) cluster).readDevKitNameAttribute(
+              (ChipClusters.CharStringAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+          readNordicDevKitDevKitNameCommandParams
+        );
+        result.put("readDevKitNameAttribute", readNordicDevKitDevKitNameAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNordicDevKitUserLEDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNordicDevKitUserLEDAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NordicDevKitCluster) cluster).readUserLEDAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readNordicDevKitUserLEDCommandParams
+        );
+        result.put("readUserLEDAttribute", readNordicDevKitUserLEDAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNordicDevKitUserButtonCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNordicDevKitUserButtonAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NordicDevKitCluster) cluster).readUserButtonAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readNordicDevKitUserButtonCommandParams
+        );
+        result.put("readUserButtonAttribute", readNordicDevKitUserButtonAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readUnitTestingInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingBooleanAttributeInteractionInfo = new InteractionInfo(
@@ -20526,6 +20629,7 @@ public class ClusterReadMapping {
             put("tlsClientManagement", readTlsClientManagementInteractionInfo());
             put("meterIdentification", readMeterIdentificationInteractionInfo());
             put("commodityMetering", readCommodityMeteringInteractionInfo());
+            put("nordicDevKit", readNordicDevKitInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
             put("faultInjection", readFaultInjectionInteractionInfo());
             put("sampleMei", readSampleMeiInteractionInfo());}};

@@ -438,6 +438,9 @@ static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttribute
     case Attributes::MaxPathsPerInvoke::Id: {
         return YES;
     }
+    case Attributes::RandomNumber::Id: {
+        return YES;
+    }
     case Attributes::ConfigurationVersion::Id: {
         return YES;
     }
@@ -6565,6 +6568,40 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     }
     }
 }
+static BOOL AttributeIsSpecifiedInNordicDevKitCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::NordicDevKit;
+    switch (aAttributeId) {
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    case Attributes::DevKitName::Id: {
+        return YES;
+    }
+    case Attributes::UserLED::Id: {
+        return YES;
+    }
+    case Attributes::UserButton::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known NordicDevKit attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -7290,6 +7327,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::CommodityMetering::Id: {
         return AttributeIsSpecifiedInCommodityMeteringCluster(aAttributeId);
+    }
+    case Clusters::NordicDevKit::Id: {
+        return AttributeIsSpecifiedInNordicDevKitCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);

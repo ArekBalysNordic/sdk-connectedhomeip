@@ -400,6 +400,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ModeSelectCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/NetworkCommissioningCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/NitrogenDioxideConcentrationMeasurementCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/NordicDevKitCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/OccupancySensingCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/OnOffCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/OperationalCredentialsCluster.kt",

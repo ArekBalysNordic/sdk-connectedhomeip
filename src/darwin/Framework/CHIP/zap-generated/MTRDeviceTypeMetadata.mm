@@ -24,6 +24,7 @@ namespace {
 // Not constexpr in the strict sense because NSString * is not a literal
 // type, but the array is in fact constant initialized by the compiler.
 static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
+    { 0x00000001, MTRDeviceTypeClass::Simple, @"Nordic Development Kit" },
     { 0x0000000A, MTRDeviceTypeClass::Simple, @"Door Lock" },
     { 0x0000000B, MTRDeviceTypeClass::Simple, @"Door Lock Controller" },
     { 0x0000000E, MTRDeviceTypeClass::Simple, @"Aggregator" },

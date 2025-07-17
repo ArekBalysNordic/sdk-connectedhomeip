@@ -1971,6 +1971,37 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)generateRandomWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self generateRandomWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)generateRandomWithParams:(MTRBasicInformationClusterGenerateRandomParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRBasicInformationClusterGenerateRandomParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = BasicInformation::Commands::GenerateRandom::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeDataModelRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeDataModelRevisionID) params:params];
@@ -2117,6 +2148,22 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxPathsPerInvokeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeMaxPathsPerInvokeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRandomNumberWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeRandomNumberID) params:params];
+}
+
+- (void)writeAttributeRandomNumberWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeRandomNumberWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeRandomNumberWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeRandomNumberID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeConfigurationVersionWithParams:(MTRReadParams * _Nullable)params
@@ -22512,6 +22559,88 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterNordicDevKit
+
+- (void)setLEDWithParams:(MTRNordicDevKitClusterSetLEDParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRNordicDevKitClusterSetLEDParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = NordicDevKit::Commands::SetLED::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNordicDevKitID) attributeID:@(MTRAttributeIDTypeClusterNordicDevKitAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNordicDevKitID) attributeID:@(MTRAttributeIDTypeClusterNordicDevKitAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNordicDevKitID) attributeID:@(MTRAttributeIDTypeClusterNordicDevKitAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNordicDevKitID) attributeID:@(MTRAttributeIDTypeClusterNordicDevKitAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNordicDevKitID) attributeID:@(MTRAttributeIDTypeClusterNordicDevKitAttributeClusterRevisionID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDevKitNameWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNordicDevKitID) attributeID:@(MTRAttributeIDTypeClusterNordicDevKitAttributeDevKitNameID) params:params];
+}
+
+- (void)writeAttributeDevKitNameWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeDevKitNameWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeDevKitNameWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNordicDevKitID) attributeID:@(MTRAttributeIDTypeClusterNordicDevKitAttributeDevKitNameID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUserLEDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNordicDevKitID) attributeID:@(MTRAttributeIDTypeClusterNordicDevKitAttributeUserLEDID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUserButtonWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeNordicDevKitID) attributeID:@(MTRAttributeIDTypeClusterNordicDevKitAttributeUserButtonID) params:params];
 }
 
 @end

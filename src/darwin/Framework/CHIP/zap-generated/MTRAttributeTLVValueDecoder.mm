@@ -1422,6 +1422,17 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
         value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
+    case Attributes::RandomNumber::Id: {
+        using TypeInfo = Attributes::RandomNumber::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
     case Attributes::ConfigurationVersion::Id: {
         using TypeInfo = Attributes::ConfigurationVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -20779,6 +20790,57 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForNordicDevKitCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::NordicDevKit;
+    switch (aAttributeId) {
+    case Attributes::DevKitName::Id: {
+        using TypeInfo = Attributes::DevKitName::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
+        return value;
+    }
+    case Attributes::UserLED::Id: {
+        using TypeInfo = Attributes::UserLED::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::UserButton::Id: {
+        using TypeInfo = Attributes::UserButton::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    default: {
+        // Not a known NordicDevKit attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::UnitTesting;
@@ -22779,6 +22841,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::CommodityMetering::Id: {
         return DecodeAttributeValueForCommodityMeteringCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::NordicDevKit::Id: {
+        return DecodeAttributeValueForNordicDevKitCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::UnitTesting::Id: {
         return DecodeAttributeValueForUnitTestingCluster(aPath.mAttributeId, aReader, aError);

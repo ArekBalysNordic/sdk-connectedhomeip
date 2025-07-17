@@ -429,6 +429,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeCommodityMeteringID:
         result = @"CommodityMetering";
         break;
+    case MTRClusterIDTypeNordicDevKitID:
+        result = @"NordicDevKit";
+        break;
     case MTRClusterIDTypeUnitTestingID:
         result = @"UnitTesting";
         break;
@@ -991,6 +994,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterBasicInformationAttributeMaxPathsPerInvokeID:
             result = @"MaxPathsPerInvoke";
+            break;
+
+        case MTRAttributeIDTypeClusterBasicInformationAttributeRandomNumberID:
+            result = @"RandomNumber";
             break;
 
         case MTRAttributeIDTypeClusterBasicInformationAttributeConfigurationVersionID:
@@ -8996,6 +9003,50 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeNordicDevKitID:
+
+        switch (attributeID) {
+
+            // Cluster NordicDevKit attributes
+        case MTRAttributeIDTypeClusterNordicDevKitAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNordicDevKitAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNordicDevKitAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterNordicDevKitAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterNordicDevKitAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        case MTRAttributeIDTypeClusterNordicDevKitAttributeDevKitNameID:
+            result = @"DevKitName";
+            break;
+
+        case MTRAttributeIDTypeClusterNordicDevKitAttributeUserLEDID:
+            result = @"UserLED";
+            break;
+
+        case MTRAttributeIDTypeClusterNordicDevKitAttributeUserButtonID:
+            result = @"UserButton";
+            break;
+
+        default:
+            // Not a known NordicDevKit attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeUnitTestingID:
 
         switch (attributeID) {
@@ -9673,6 +9724,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
     case MTRClusterIDTypeBasicInformationID:
 
         switch (commandID) {
+
+        case MTRCommandIDTypeClusterBasicInformationCommandGenerateRandomID:
+            result = @"GenerateRandom";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -12164,6 +12219,20 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeNordicDevKitID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterNordicDevKitCommandSetLEDID:
+            result = @"SetLED";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeUnitTestingID:
 
         switch (commandID) {
@@ -14042,6 +14111,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeNordicDevKitID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeUnitTestingID:
 
         switch (commandID) {
@@ -14277,6 +14356,10 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         case MTREventIDTypeClusterBasicInformationEventReachableChangedID:
             result = @"ReachableChanged";
+            break;
+
+        case MTREventIDTypeClusterBasicInformationEventRandomNumberChangedID:
+            result = @"RandomNumberChanged";
             break;
 
         default:
@@ -16007,6 +16090,21 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeCommodityMeteringID:
 
         switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNordicDevKitID:
+
+        switch (eventID) {
+
+            // Cluster NordicDevKit events
+        case MTREventIDTypeClusterNordicDevKitEventUserButtonChangedID:
+            result = @"UserButtonChanged";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

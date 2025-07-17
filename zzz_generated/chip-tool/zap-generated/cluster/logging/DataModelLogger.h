@@ -662,6 +662,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::BasicInformation::Events::ReachableChanged::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::BasicInformation::Events::RandomNumberChanged::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType & value);
@@ -904,6 +906,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::CommissionerControl::Events::CommissioningRequestResult::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::NordicDevKit::Events::UserButtonChanged::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::UnitTesting::Events::TestEvent::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

@@ -30,6 +30,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <core/ErrorStr.h>
+#include <dac_provider/CommonDACProvider.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -65,7 +66,8 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
 CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
     CHIP_ERROR err;
-    mCB = cb;
+    mCB         = cb;
+    mIsInitDone = false;
 
     ChipLogProgress(DeviceLayer, "Start to init MemoryInit");
     err = Platform::MemoryInit();
@@ -79,7 +81,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = mFactoryDataProvider.Init();
     SuccessOrExit(err);
     SetCommissionableDataProvider(&mFactoryDataProvider);
-    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(GetDACProvider());
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -121,6 +123,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     SuccessOrExit(err);
     ChipLogProgress(DeviceLayer, "Start OpenThread task done!!");
 #endif // CHIP_ENABLE_OPENTHREAD
+    mIsInitDone = true;
 
 exit:
     return err;

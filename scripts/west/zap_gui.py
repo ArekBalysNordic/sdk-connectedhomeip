@@ -3,7 +3,11 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 
 import argparse
+import os
+import pwd
+import grp
 from pathlib import Path
+import subprocess
 
 from textwrap import dedent
 
@@ -89,4 +93,18 @@ class ZapGui(WestCommand):
             cmd += ["--stateDirectory", args.cache.absolute()]
         else:
             cmd += ["--tempState"]
-        self.check_call([str(x) for x in cmd])
+
+        try:
+            self.check_call([str(x) for x in cmd])
+        except subprocess.CalledProcessError as e:
+            if e.returncode == -5:
+                # Got error that the sandbox is not found
+                log.inf("\nThe wrong sandbox permissions are used. Do you wanto to add the permissions to the sandbox?")
+                answer = input("y/n: ")
+                if answer == "y":
+                    # Add the permissions to the sandbox
+                    subprocess.check_call(['sudo', 'chown', 'root', str(
+                        zap_installer.get_install_path() / 'chrome-sandbox')])
+                    subprocess.check_call(['sudo', 'chmod', '4755', str(zap_installer.get_install_path() / 'chrome-sandbox')])
+                    log.inf("Permissions added to the sandbox")
+                    self.check_call([str(x) for x in cmd])

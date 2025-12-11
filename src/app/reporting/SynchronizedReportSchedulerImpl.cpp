@@ -61,13 +61,22 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, Read
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(this);
+
+#if CHIP_CONFIG_TEST
+    // In test mode, we can call TimerFired() directly when timeout is 0 to avoid the delay and ensure backward compatibility.
     if (timeout == Milliseconds32(0))
     {
-        TimerFired();
+        node->TimerFired();
         return CHIP_NO_ERROR;
     }
-    ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
-    mNextReportTimestamp = now + timeout;
+#endif
+
+    // Always use a timer, even if the timeout is 0.
+    // This gives time for other changes in the system to finish before the report runs.
+    // If we run TimerFired() right away when timeout=0, reports might use old or incomplete data.
+    // Using a minimum 1ms delay lets the current code finish before running the report.
+    Timeout effectiveTimeout = (timeout == Milliseconds32(0)) ? Milliseconds32(1) : timeout;
+    ReturnErrorOnFailure(mTimerDelegate->StartTimer(node, effectiveTimeout));
 
     return CHIP_NO_ERROR;
 }

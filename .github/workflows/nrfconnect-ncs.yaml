@@ -79,6 +79,21 @@ jobs:
             - name: Check nRF Connect SDK revision.
               run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow"
               continue-on-error: true
+            # Workaround, the current docker image does not have the Zephyr SDK 1.0 installed, so we need to switch to it.
+            # It can be removed once the docker image is updated in the Matter upstream repository and switched to use the Zephyr SDK 1.0.
+            - name: Switch to Zephyr SDK 1.0
+              run: |
+                  if [ ! -f ./nrfutil ]; then
+                      curl --location https://files.nordicsemi.com/artifactory/swtools/external/nrfutil/executables/x86_64-unknown-linux-gnu/nrfutil -o nrfutil
+                  fi
+                  chmod +x ./nrfutil
+                  ./nrfutil self-upgrade --to-version 8.1.1
+                  ./nrfutil install sdk-manager
+                  ./nrfutil sdk-manager toolchain install --toolchain-bundle-id b50f8a9630 --install-dir /opt/NordicSemiconductor/nRF5_tools/zephyr-sdk
+                  rm $ZEPHYR_BASE/../zephyr-env.sh
+                  ./nrfutil sdk-manager toolchain env --as-script --toolchain-bundle-id b50f8a9630 --install-dir /opt/NordicSemiconductor/nRF5_tools/zephyr-sdk > $ZEPHYR_BASE/../zephyr-env.sh
+                  source $ZEPHYR_BASE/../zephyr-env.sh
+             
             - name: Run unit tests of factory data generation script
               run: |
                   scripts/run_in_build_env.sh 'source $ZEPHYR_BASE/../zephyr-env.sh && pip3 install -r scripts/setup/requirements.nrfconnect.txt'

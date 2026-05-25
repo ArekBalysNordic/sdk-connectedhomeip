@@ -17,24 +17,8 @@
 # The purpose of this file is to define Kconfig options enabling specific features.
 # Feature options will define defaults for settings that are related to the specific feature.
 
-if CHIP
-
-if NORDIC_QSPI_NOR
-
-config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
-	default 16
-
-endif # NORDIC_QSPI_NOR
-
-if SPI_NOR
-
-config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
-	default 4096
-
-config PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
-	default y
-
-endif # SPI_NOR
+menu "Matter features"
+	depends on CHIP
 
 config CHIP_MEMORY_PROFILING
 	bool "Enable features for tracking memory usage"
@@ -75,56 +59,6 @@ config CHIP_DFU_OVER_BT_SMP
 	help
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.
-
-if CHIP_DFU_OVER_BT_SMP
-
-# MCU Manager and SMP configuration
-choice MCUMGR_TRANSPORT_BT_PERM
-	default MCUMGR_TRANSPORT_BT_PERM_RW
-endchoice
-
-config MCUMGR_TRANSPORT_NETBUF_COUNT
-	default 6
-
-config MCUMGR_MGMT_NOTIFICATION_HOOKS
-	bool
-	default y
-
-config MCUMGR_GRP_IMG_UPLOAD_CHECK_HOOK
-	bool
-	default y
-
-config MCUMGR_SMP_COMMAND_STATUS_HOOKS
-	bool
-	default y
-
-# Increase BT MTU and RX buffer sizes to improve DFU throughput on non-RAM-constrained devices
-config BT_L2CAP_TX_MTU
-	default 498 if !SOC_NRF54L10
-
-config BT_BUF_ACL_RX_SIZE
-	default 502 if !SOC_NRF54L10
-
-# Increase MCUMGR_TRANSPORT_NETBUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
-config MCUMGR_TRANSPORT_NETBUF_SIZE
-	default 1024
-
-# Increase system workqueue size, as SMP is processed within it
-config SYSTEM_WORKQUEUE_STACK_SIZE
-	default 2800
-
-if SOC_SERIES_NRF53
-
-# Enable custom SMP request to erase settings partition.
-config MCUMGR_GRP_ZBASIC
-	default y
-
-config MCUMGR_GRP_ZBASIC_STORAGE_ERASE
-	default y
-
-endif # SOC_SERIES_NRF53
-
-endif # CHIP_DFU_OVER_BT_SMP
 
 config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
 	int "Define the minimum connection recovery time interval in milliseconds"
@@ -204,4 +138,5 @@ config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
 	  After removing the last fabric the device will wait for the defined time and then perform
 	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
 	  avoiding race conditions before the device removes non-volatile data.
-endif # CHIP
+
+endmenu
